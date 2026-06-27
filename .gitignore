@@ -13,6 +13,7 @@ Thumbs.db
 /dist/
 /build/
 /out/
+target/
 
 # Python
 __pycache__/
@@ -22,5 +23,3 @@ __pycache__/
 # Node
 node_modules/
 package-lock.json
-
-layer4_tptr/target/debug/incremental/tptr_core-1191vzykkgmzw/s-hjv0y2ebrk-1yn8fws-2q2knx59d2b49tx9e303fj7v8/6ezie4hgbq3bdq02y7ibhofjh.o

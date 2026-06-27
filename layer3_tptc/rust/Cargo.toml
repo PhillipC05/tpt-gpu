@@ -1,0 +1,13 @@
+[package]
+name = "tptc-rs"
+version = "0.1.0"
+edition = "2021"
+description = "Rust port of TPTIR compiler stack"
+[lib]
+name = "tptc_rs"
+crate-type = ["lib", "cdylib"]
+[dependencies]
+libc = "0.2"
+[features]
+default = ["ffi"]
+ffi = []
