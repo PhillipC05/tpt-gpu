@@ -8,6 +8,7 @@ pub mod memory;
 pub mod command;
 pub mod kernel;
 pub mod device;
+pub mod dispatch;
 
 /// Re-export the error types at the crate root.
 pub use error::{TptrError, TptrResult, ErrorCode, ErrorContext};
@@ -23,3 +24,6 @@ pub use command::{CommandQueue, CommandScheduler, Command, QueuePriority, QueueH
 
 /// Re-export kernel types at the crate root.
 pub use kernel::{Kernel, KernelConfig, KernelHandle, Dim3, KernelLaunchMode};
+
+/// Re-export dispatch types at the crate root.
+pub use dispatch::{CommandBatch, BatchSubmitter, MemoryPool, PoolManager, PoolStats, DispatchTable, OpHandle};
