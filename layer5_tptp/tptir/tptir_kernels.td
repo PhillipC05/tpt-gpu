@@ -1,0 +1,73 @@
+// tptir_kernels.td — TPTIR Kernel Operation Definitions
+// TPT GPU — Tensor Processing Technology
+// License: Apache License 2.0 (with Express Patent Grant)
+// TPTIR GPU Kernel operations for GEMM, Attention, Conv2D, and ML primitives.
+
+#ifndef TPTIR_KERNELS_TD
+#define TPTIR_KERNELS_TD
+
+include "mlir/IR/OpBase.td"
+include "mlir/IR/BuiltinTypes.td"
+
+def TPTIR_Kernel_Dialect : Dialect {
+  let name = "tptir_kernel";
+  let summary = "TPTIR GPU Kernel Operations";
+  let cppNamespace = "tptir::kernel";
+}
+
+def TensorType : TypeConstraint<CPred<"$_self.isa<TensorType>()">, "tensor type">;
+def Float32Type : TypeConstraint<CPred<"$_self.isa<Float32Type>()">, "f32 type">;
+def IndexType : TypeConstraint<CPred<"$_self.isa<IndexType>()">, "index type">;
+def BoolAttr : Attr<CPred<"$_self.isa<BoolAttr>()">, "bool attribute">;
+
+// GEMM: C = alpha * A * B + beta * C
+def TPTIR_GemmOp : Op<TPTIR_Kernel_Dialect, "gemm", [Pure]> {
+  let summary = "General Matrix Multiply";
+  let arguments = (ins TensorType:$A, TensorType:$B, TensorType:$C,
+                   Float32Type:$alpha, Float32Type:$beta,
+                   IndexType:$M, IndexType:$N, IndexType:$K);
+  let results = (outs TensorType:$result);
+  let assemblyFormat = "`ins` `(` $A `,` $B `,` $C `:` type($A) `,` type($B) `,` type($C) `)` `attrs` attr-dict `->` type($result)";
+  let hasVerifier = 1;
+}
+
+// Attention: softmax(Q * K^T / scale) * V
+def TPTIR_AttentionOp : Op<TPTIR_Kernel_Dialect, "attention", [Pure]> {
+  let summary = "Scaled Dot-Product Attention";
+  let arguments = (ins TensorType:$Q, TensorType:$K, TensorType:$V,
+                   Float32Type:$scale, TensorType:$mask,
+                   IndexType:$seq_len, IndexType:$d_k, IndexType:$d_v,
+                   BoolAttr:$causal);
+  let results = (outs TensorType:$output, TensorType:$attention_weights);
+  let hasVerifier = 1;
+}
+
+// Conv2D: output = conv2d(input, filter, strides, padding)
+def TPTIR_Conv2DOp : Op<TPTIR_Kernel_Dialect, "conv2d", [Pure]> {
+  let summary = "2D Convolution";
+  let arguments = (ins TensorType:$input, TensorType:$filter,
+                   I32Attr:$stride_h, I32Attr:$stride_w,
+                   I32Attr:$padding_h, I32Attr:$padding_w,
+                   I32Attr:$dilation_h, I32Attr:$dilation_w,
+                   I32Attr:$groups);
+  let results = (outs TensorType:$output);
+  let assemblyFormat = "`ins` `(` $input `,` $filter `:` type($input) `,` type($filter) `)` `attrs` attr-dict `->` type($output)";
+  let hasVerifier = 1;
+}
+
+// Softmax: softmax along last dimension
+def TPTIR_SoftmaxOp : Op<TPTIR_Kernel_Dialect, "softmax", [Pure]> {
+  let summary = "Softmax kernel";
+  let arguments = (ins TensorType:$input, IndexType:$dim);
+  let results = (outs TensorType:$output);
+}
+
+// LayerNorm: layer normalization
+def TPTIR_LayerNormOp : Op<TPTIR_Kernel_Dialect, "layer_norm", [Pure]> {
+  let summary = "Layer Normalization";
+  let arguments = (ins TensorType:$input, TensorType:$gamma, TensorType:$beta,
+                   Float32Type:$epsilon, IndexType:$normalized_axis);
+  let results = (outs TensorType:$output);
+}
+
+#endif // TPTIR_KERNELS_TD

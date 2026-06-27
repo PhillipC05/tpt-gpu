@@ -1,0 +1,14 @@
+[package]
+name = "tptb-core"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "TPT Script compiler frontend — lexer, AST, and parser"
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+
+[dev-dependencies]
+# Used only in tests

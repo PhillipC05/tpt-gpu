@@ -56,20 +56,20 @@
 ## Phase 2 (Months 3–4): TPT Script Development
 
 ### Language Specification
-- [ ] Write TPT Script language specification document
-- [ ] Define type system with semantic metadata annotations (`@doc`, `@input`, `@output`, `@constraint`, `@complexity`)
-- [ ] Define capability declaration system (`@requires_gpu`, `@requires_tensor_cores`, `@min_vram_gb`, etc.)
-- [ ] Define ~200 core operations (minimal, orthogonal API surface)
+- [x] Write TPT Script language specification document — `layer7_tptb/spec/tpts_spec.md`
+- [x] Define type system with semantic metadata annotations (`@doc`, `@input`, `@output`, `@constraint`, `@complexity`)
+- [x] Define capability declaration system (`@requires_gpu`, `@requires_tensor_cores`, `@min_vram_gb`, etc.)
+- [x] Define ~200 core operations (minimal, orthogonal API surface)
 
 ### Lexer / Parser
-- [ ] Implement lexer (tokenizer)
-- [ ] Implement parser (AST generation)
+- [x] Implement lexer (tokenizer)
+- [x] Implement parser (AST generation)
 
 ### Type System & Semantic Layer
-- [ ] Define AST node types
-- [ ] Implement type checker with tensor shape inference
-- [ ] Implement constraint checker (`@constraint` validation at compile time)
-- [ ] Implement semantic metadata extraction from annotations
+- [x] Define AST node types
+- [x] Implement type checker with tensor shape inference
+- [x] Implement constraint checker (`@constraint` validation at compile time)
+- [x] Implement semantic metadata extraction from annotations
 
 ### Compiler Backend
 - [ ] Emit Rust or LLVM IR from TPT Script AST
