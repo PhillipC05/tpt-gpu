@@ -22,13 +22,13 @@
 - [x] FFI boundary design between C and Rust components
 
 ### Layer 3 — TPTIR Compiler Stack / tptc (C++ + Rust)
-- [ ] Define TPTIR intermediate representation specification
-- [ ] MLIR/LLVM integration (C++)
-- [ ] Frontend parser / IR builder (C++)
-- [ ] Optimization passes (C++)
-- [ ] Code generation backend (C++)
-- [ ] Clean FFI boundary design (to enable Rust port later)
-- [ ] Begin parallel Rust port of critical compiler components
+- [x] Define TPTIR intermediate representation specification
+- [x] MLIR-compatible dialect definitions (C++ headers)
+- [x] Frontend parser / IR builder (C++)
+- [x] Optimization passes (C++) — canonicalize, DCE, constant fold, vectorize, tensor lowering
+- [x] Code generation backend (C++) — TPT ISA, LLVM IR, TPTIR text targets
+- [x] Clean FFI boundary design (C API + Rust FFI bindings)
+- [x] Begin parallel Rust port of critical compiler components (IR types, passes, parser)
 
 ### Layer 4 — TPT Runtime / tptr (Rust)
 - [x] GPU memory allocator (Rust) - Slab, Buddy, Fallback

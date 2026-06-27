@@ -37,7 +37,7 @@ public:
   explicit Type(TypeKind kind) : kind_(kind) {}
   virtual ~Type() = default;
   TypeKind kind() const { return kind_; }
-  bool isPrimitive() const;
+  bool isPrimitive() const { return kind_ >= TypeKind::I1 && kind_ <= TypeKind::Index; }
   bool isTensor() const { return kind_ == TypeKind::Tensor; }
   bool isVector() const { return kind_ == TypeKind::Vector; }
   bool isMemRef() const { return kind_ == TypeKind::MemRef; }

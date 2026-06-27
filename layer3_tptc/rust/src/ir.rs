@@ -1,14 +1,4 @@
-#!/usr/bin/env python3
-import os
-BASE = r"d:\Programming\1PRODUCTION\Open Source\tpt-gpu\layer3_tptc"
-def w(p, c):
-    full = os.path.join(BASE, p)
-    os.makedirs(os.path.dirname(full), exist_ok=True)
-    with open(full, 'w', encoding='utf-8', newline='\n') as f:
-        f.write(c.lstrip('\n'))
-    print(f"  {p}")
-
-w("rust/src/ir.rs", """use std::fmt;
+use std::fmt;
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub enum AddressSpace{Global,Shared,Local,Constant,Generic}
 impl fmt::Display for AddressSpace{
@@ -79,34 +69,3 @@ pub fn parse_assembly(source:&str)->Result<Region,String>{
  if!block.operations.is_empty()||region.blocks.is_empty(){region.blocks.push(block);}
  Ok(region)
 }
-""")
-w("rust/src/passes.rs", """use crate::ir::Region;
-pub trait Pass{fn name(&self)->&str;fn run(&self,region:&Region)->usize;}
-pub struct CanonicalizePass;
-impl Pass for CanonicalizePass{fn name(&self)->&str{"canonicalize"}fn run(&self,_:&Region)->usize{0}}
-pub struct DeadCodeEliminationPass;
-impl Pass for DeadCodeEliminationPass{fn name(&self)->&str{"dce"}fn run(&self,_:&Region)->usize{0}}
-pub struct PassPipeline{passes:Vec<Box<dyn Pass>>}
-impl PassPipeline{
- pub fn new()->Self{PassPipeline{passes:vec![]}}
- pub fn add(&mut self,pass:Box<dyn Pass>){self.passes.push(pass);}
- pub fn run(&self,r:&Region)->usize{let mut t=0;for p in&self.passes{t+=p.run(r);}t}
-}
-pub fn default_pipeline()->PassPipeline{
- let mut p=PassPipeline::new();
- p.add(Box::new(CanonicalizePass));p.add(Box::new(DeadCodeEliminationPass));p
-}
-""")
-w("rust/README.md", """# tptc-rs — Rust Port of TPTIR Compiler Stack
-## Build
-```bash
-cd layer3_tptc/rust && cargo build && cargo test
-```
-## Strategy
-1. FFI bindings to C++ tptc
-2. Native Rust IR + parser
-3. Native Rust passes
-4. Native Rust codegen
-5. Complete Rust migration
-""")
-print("Rust batch 2 done!")

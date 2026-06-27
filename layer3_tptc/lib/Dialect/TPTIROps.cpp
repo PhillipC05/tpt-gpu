@@ -1,6 +1,6 @@
 #include "../../include/tptir/Dialect/TPTIROps.h"
 namespace tptir {
-Value::Value(Type* type, uint64_t id) : type_(type), id_(id) {}
+Value::Value(Type* type_t id) : type_(type), id_(id) {}
 std::string Value::toString() const {
   return "%" + std::to_string(id_) + (type_ ? " : " + type_->toString() : "");
 }
@@ -15,7 +15,7 @@ bool Operation::hasAttr(const std::string& k) const { return attrs_.find(k) != a
 std::string Operation::toString() const {
   std::string s;
   if (result_) s += result_->toString() + " = ";
-  s += """ + name() + ""(";
+  s += "\"" + name() + "\"(";
   for (size_t i = 0; i < operands_.size(); i++) {
     if (i > 0) s += ", ";
     if (operands_[i]) s += operands_[i]->toString();
@@ -68,6 +68,7 @@ static const std::vector<std::string>& allOps() {
   };
   return ops;
 }
+const std::vector<std::string>& getAllOpNames() { return allOps(); }
 bool isValidOpName(const std::string& name) {
   for (auto& op : allOps()) if (op == name) return true;
   return false;
