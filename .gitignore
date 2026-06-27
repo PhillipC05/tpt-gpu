@@ -1,0 +1,25 @@
+# OS / editor
+.vscode/
+.DS_Store
+Thumbs.db
+
+# TPT / app artifacts (best-effort)
+*.log
+*.tmp
+*.swp
+*.swo
+
+# Build outputs
+/dist/
+/build/
+/out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Node
+node_modules/
+package-lock.json
+
