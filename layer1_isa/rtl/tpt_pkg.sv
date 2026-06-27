@@ -90,6 +90,7 @@ package tpt_pkg;
     OP_SYSTEM     = 5'b01110,
     OP_PRED       = 5'b01111,
     OP_MISC       = 5'b10000
+  } opcode_t;
 
   //--------------------------------------------------------------------------
   // Integer ALU Functions
@@ -237,8 +238,6 @@ package tpt_pkg;
     ASPACE_CONSTANT = 2'b11
   } aspace_t;
 
-  } opcode_t;
-
   //--------------------------------------------------------------------------
   // Decoded Instruction Structure
   //--------------------------------------------------------------------------
@@ -273,5 +272,3 @@ package tpt_pkg;
   } decoded_instr_t;
 
 endpackage : tpt_pkg
-
-  } opcode_t;

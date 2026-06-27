@@ -9,9 +9,9 @@
 ## Phase 1 (Months 1–3): Core Infrastructure
 
 ### Layer 1 — TPT ISA (SystemVerilog)
-- [ ] Write TPT ISA specification document
-- [ ] Implement ISA in SystemVerilog
-- [ ] Build SystemVerilog testbench / simulation
+- [x] Write TPT ISA specification document
+- [x] Implement ISA in SystemVerilog
+- [x] Build SystemVerilog testbench / simulation
 
 ### Layer 2 — TPT Driver / tptd (C + Rust)
 - [ ] Linux DRM kernel module (Rust for Linux, kernel 6.1+)
