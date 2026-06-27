@@ -5,7 +5,7 @@ Provides a Pythonic, context-managed API over the low-level Rust bindings.
 from __future__ import annotations
 from typing import Optional, Dict, Any, Tuple
 from contextlib import contextmanager
-from tptr._ffi import (
+from .._ffi import (
     Device as _NativeDevice,
     MemoryAllocation as _NativeMemoryAllocation,
     CommandQueue as _NativeCommandQueue,
@@ -159,5 +159,9 @@ def device_context(index: int = 0):
     try:
         yield dev
     finally:
+<<<<<<< Updated upstream
         dev.synchronize()
 
+=======
+        dev.synchronize()
+>>>>>>> Stashed changes

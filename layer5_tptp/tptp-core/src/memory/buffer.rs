@@ -58,9 +58,19 @@ impl fmt::Display for Shape {
     }
 }
 
+/// GPU buffer handle.
+///
+/// Always maintains a host-side `storage` backing store so that
+/// `copy_from_host` / `copy_to_host` work in all build configurations —
+/// including sim mode and CI without hardware. On real hardware the backing
+/// store serves as the staging buffer for transfers; the GPU-side handle
+/// would be carried separately once Layer 2 driver integration is complete.
 pub struct GpuBuffer<T: Pod> {
-    shape: Shape, dtype: DType, byte_size: usize, flags: BufferFlags,
-    #[cfg(feature = "sim")] storage: Vec<u8>,
+    shape: Shape,
+    dtype: DType,
+    byte_size: usize,
+    flags: BufferFlags,
+    storage: Vec<u8>,
     _phantom: std::marker::PhantomData<T>,
 }
 
@@ -72,8 +82,7 @@ impl<T: Pod> GpuBuffer<T> {
         if !shape.is_valid() { return Err(TptpError::ShapeError { message: format!("invalid shape: {}", shape), expected: None, got: None }); }
         let num_elements = shape.num_elements();
         let byte_size = num_elements.checked_mul(dtype.size_bytes()).ok_or_else(|| TptpError::ShapeError { message: "shape too large".to_string(), expected: None, got: None })?;
-        #[cfg(feature = "sim")] let storage = vec![0u8; byte_size];
-        Ok(GpuBuffer { shape, dtype, byte_size, flags, #[cfg(feature = "sim")] storage, _phantom: std::marker::PhantomData })
+        Ok(GpuBuffer { shape, dtype, byte_size, flags, storage: vec![0u8; byte_size], _phantom: std::marker::PhantomData })
     }
     pub fn shape(&self) -> &Shape { &self.shape }
     pub fn dtype(&self) -> DType { self.dtype }
@@ -81,14 +90,22 @@ impl<T: Pod> GpuBuffer<T> {
     pub fn byte_size(&self) -> usize { self.byte_size }
     pub fn ndim(&self) -> usize { self.shape.ndim() }
     pub fn dim(&self, i: usize) -> Option<usize> { self.shape.dim(i) }
+
     pub fn copy_from_host(&mut self, data: &[T]) -> TptpResult<()> {
-        if data.len() != self.num_elements() { return Err(TptpError::ShapeError { message: format!("data length {} != buffer size {}", data.len(), self.num_elements()), expected: Some(self.num_elements().to_string()), got: Some(data.len().to_string()) }); }
-        #[cfg(feature = "sim")] { let bytes = bytemuck::cast_slice(data); self.storage[..bytes.len()].copy_from_slice(bytes); }
+        if data.len() != self.num_elements() {
+            return Err(TptpError::ShapeError { message: format!("data length {} != buffer size {}", data.len(), self.num_elements()), expected: Some(self.num_elements().to_string()), got: Some(data.len().to_string()) });
+        }
+        let bytes = bytemuck::cast_slice(data);
+        self.storage[..bytes.len()].copy_from_slice(bytes);
         Ok(())
     }
+
     pub fn copy_to_host(&self, data: &mut [T]) -> TptpResult<()> {
-        if data.len() != self.num_elements() { return Err(TptpError::ShapeError { message: format!("output length {} != buffer size {}", data.len(), self.num_elements()), expected: Some(self.num_elements().to_string()), got: Some(data.len().to_string()) }); }
-        #[cfg(feature = "sim")] { let bytes = bytemuck::cast_slice_mut(data); bytes.copy_from_slice(&self.storage[..bytes.len()]); }
+        if data.len() != self.num_elements() {
+            return Err(TptpError::ShapeError { message: format!("output length {} != buffer size {}", data.len(), self.num_elements()), expected: Some(self.num_elements().to_string()), got: Some(data.len().to_string()) });
+        }
+        let bytes = bytemuck::cast_slice_mut(data);
+        bytes.copy_from_slice(&self.storage[..bytes.len()]);
         Ok(())
     }
 }

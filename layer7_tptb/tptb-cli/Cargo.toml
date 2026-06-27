@@ -1,0 +1,15 @@
+[package]
+name = "tptb-cli"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+description = "tpt — command-line interface for the TPT Script compiler"
+license.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "tpt"
+path = "src/main.rs"
+
+[dependencies]
+tptb-core = { path = "../tptb-core" }

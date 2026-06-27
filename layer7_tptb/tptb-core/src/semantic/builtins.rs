@@ -191,8 +191,9 @@ pub fn infer_builtin(name: &str, args: &[TptType], named: &[(&str, TptType)]) ->
         "argmax" | "argmin" => {
             TptType::Tensor { dtype: Box::new(TptType::I64), shape: vec![DimVal::Dynamic] }
         }
-        "any" | "all" => {
-            TptType::Tensor { dtype: Box::new(TptType::Bool), shape: vec![DimVal::Dynamic] }
+        "any" | "all" | "none" => {
+            // Global reductions collapse the entire tensor to a scalar bool.
+            TptType::Bool
         }
 
         // ---- Comparison / masking ----

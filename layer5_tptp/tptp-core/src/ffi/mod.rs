@@ -4,4 +4,7 @@
 
 pub mod tptir_ffi;
 
-pub use tptir_ffi::{TptirCompilerHandle, TptirModule, compile_kernel};
+pub use tptir_ffi::{TptirCompilerHandle, compile_kernel};
+
+#[cfg(feature = "tptir-backend")]
+pub use tptir_ffi::TptirModule;

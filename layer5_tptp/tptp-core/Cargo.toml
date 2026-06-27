@@ -8,7 +8,7 @@ license.workspace = true
 repository.workspace = true
 
 [lib]
-name = "tptp"
+name = "tptp_core"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
@@ -22,12 +22,12 @@ libc = { workspace = true }
 env_logger = "0.11"
 
 [features]
-default = ["tptir-backend"]
-# Enable TPTIR compiler backend (requires tptc C API)
+default = []
+# Enable TPTIR compiler backend (requires tptc C library to be linked)
 tptir-backend = []
 # Enable vendor library backends
 cuda = []
 rocm = []
 metal = []
-# Simulation mode for CI / testing without hardware
+# Simulation mode for CI / testing without hardware; disables all FFI
 sim = []

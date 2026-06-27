@@ -1,11 +1,15 @@
 pub mod ast;
 pub mod codegen;
+pub mod errors;
+pub mod introspect;
 pub mod lexer;
 pub mod parser;
 pub mod semantic;
 
 pub use ast::Program;
 pub use codegen::{emit, CodegenOutput};
+pub use errors::{ErrorCode, ErrorContext, TptError, TypeError};
+pub use introspect::DocFormat;
 pub use lexer::{tokenize, LexError, Span, Token, TokenKind};
 pub use parser::{parse, ParseError};
 pub use semantic::{type_check, TypeChecker};

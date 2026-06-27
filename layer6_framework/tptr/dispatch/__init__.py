@@ -8,7 +8,6 @@ from enum import Enum
 
 
 class OpType(Enum):
-    """Operation type classification."""
     ELEMENTWISE_BINARY = "elementwise_binary"
     ELEMENTWISE_UNARY = "elementwise_unary"
     REDUCTION = "reduction"
@@ -23,7 +22,6 @@ class OpType(Enum):
 
 @dataclass
 class OpMetadata:
-    """Metadata for a registered operation."""
     name: str
     op_type: OpType
     input_count: int
@@ -35,13 +33,13 @@ class OpMetadata:
 
 @dataclass
 class OpEntry:
-    """A registered operation entry."""
     metadata: OpMetadata
     factory: Callable
     backend: str = "tptr"
 
 
 def _default_factory(name: str) -> Callable:
+<<<<<<< Updated upstream
     """Create a default factory that returns a no-op function."""
     def factory():
         return lambda *args, **kwargs: None
@@ -50,15 +48,20 @@ def _default_factory(name: str) -> Callable:
 
 class DispatchRegistry:
     """Registry for tensor operations mapping high-level ops to TPT kernels."""
+=======
+    def factory():
+        return lambda *args, **kwargs: None
+    return factory
+>>>>>>> Stashed changes
 
+
+class DispatchRegistry:
     def __init__(self):
         self._ops: Dict[str, OpEntry] = {}
 
-    def register(self, name: str, op_type: OpType = OpType.CUSTOM,
-                 input_count: int = 2, output_count: int = 1,
-                 supports_inplace: bool = False, kernel_name: Optional[str] = None,
-                 description: str = "", factory: Optional[Callable] = None,
-                 backend: str = "tptr") -> None:
+    def register(self, name, op_type=OpType.CUSTOM, input_count=2, output_count=1,
+                 supports_inplace=False, kernel_name=None, description="",
+                 factory=None, backend="tptr"):
         metadata = OpMetadata(name=name, op_type=op_type, input_count=input_count,
                               output_count=output_count, supports_inplace=supports_inplace,
                               kernel_name=kernel_name, description=description)
@@ -66,32 +69,35 @@ class DispatchRegistry:
             factory = _default_factory(name)
         self._ops[name] = OpEntry(metadata=metadata, factory=factory, backend=backend)
 
-    def register_custom(self, name: str, factory: Callable,
-                        op_type: OpType = OpType.CUSTOM, **kwargs) -> None:
+    def register_custom(self, name, factory, op_type=OpType.CUSTOM, **kwargs):
         self.register(name, op_type, factory=factory, **kwargs)
 
-    def lookup(self, name: str) -> Optional[OpEntry]:
+    def lookup(self, name):
         return self._ops.get(name)
 
-    def dispatch(self, name: str, *args, **kwargs) -> Any:
+    def dispatch(self, name, *args, **kwargs):
         entry = self._ops.get(name)
         if entry is None:
             raise KeyError(f"Operation '{name}' not registered")
         impl = entry.factory()
         return impl(*args, **kwargs)
 
-    def list_ops(self) -> List[str]:
+    def list_ops(self):
         return list(self._ops.keys())
 
-    def has(self, name: str) -> bool:
+    def list_by_type(self, op_type):
+        return [name for name, entry in self._ops.items() if entry.metadata.op_type == op_type]
+
+    def has(self, name):
         return name in self._ops
 
-    def remove(self, name: str) -> bool:
+    def remove(self, name):
         if name in self._ops:
             del self._ops[name]
             return True
         return False
 
+<<<<<<< Updated upstream
     def clear(self) -> None:
         self._ops.clear()
 
@@ -106,22 +112,33 @@ class DispatchRegistry:
 
 
 # Module-level default registry
+=======
+    def clear(self):
+        self._ops.clear()
+
+    def __len__(self):
+        return len(self._ops)
+
+    def __contains__(self, name):
+        return name in self._ops
+
+
+>>>>>>> Stashed changes
 _default_registry = DispatchRegistry()
 
 
-def register_op(name: str, op_type: OpType = OpType.CUSTOM, **kwargs) -> None:
+def register_op(name, op_type=OpType.CUSTOM, **kwargs):
     _default_registry.register(name, op_type, **kwargs)
 
 
-def get_dispatch_table() -> DispatchRegistry:
+def get_dispatch_table():
     return _default_registry
 
 
-def dispatch_op(name: str, *args, **kwargs) -> Any:
+def dispatch_op(name, *args, **kwargs):
     return _default_registry.dispatch(name, *args, **kwargs)
 
 
-# Register standard operations
 _default_registry.register("add", OpType.ELEMENTWISE_BINARY, input_count=2, output_count=1,
                           supports_inplace=True, kernel_name="tptr_add",
                           description="Element-wise addition")
@@ -148,6 +165,7 @@ _default_registry.register("mean", OpType.REDUCTION, input_count=1, output_count
 _default_registry.register("matmul", OpType.MATMUL, input_count=2, output_count=1,
                           kernel_name="tptr_matmul", description="Matrix multiplication")
 _default_registry.register("layer_norm", OpType.LAYER_NORM, input_count=1, output_count=1,
+<<<<<<< Updated upstream
                           kernel_name="tptr_layer_norm", description="Layer normalization")
 
 
@@ -156,3 +174,6 @@ def _default_factory(name: str) -> Callable:
         return lambda *args, **kwargs: None
     return factory
 
+=======
+                          kernel_name="tptr_layer_norm", description="Layer normalization")
+>>>>>>> Stashed changes

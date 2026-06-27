@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Optional, Tuple, Union
 from enum import IntEnum
 import math
-from tptr._ffi import Device as _NativeDevice, TptrError
+from .._ffi import Device as _NativeDevice, TptrError
 
 
 class TptrDType(IntEnum):
@@ -42,10 +42,16 @@ float64 = TptrDType.FLOAT64
 int8 = TptrDType.INT8
 int16 = TptrDType.INT16
 int32 = TptrDType.INT32
+int64 = TptrDType.INT64
+uint8 = TptrDType.UINT8
+uint16 = TptrDType.UINT16
+uint32 = TptrDType.UINT32
+bool_ = TptrDType.BOOL
+
+
 class TptrTensor:
     """GPU tensor backed by TPT runtime memory."""
-    def __init__(self, shape: Tuple[int, ...], dtype: TptrDType = float32,
-                 data: Optional[bytes] = None, device_index: int = 0):
+    def __init__(self, shape, dtype=float32, data=None, device_index=0):
         self._shape = tuple(shape)
         self._dtype = dtype
         self._device_index = device_index
@@ -54,48 +60,68 @@ class TptrTensor:
         self._native_device = _NativeDevice(device_index)
         self._native_alloc = self._native_device.allocate(self._nbytes)
         if data is not None:
-            self._native_device.memcpy_htod(self._alloc, data, len(data))
+            self._native_device.memcpy_htod(self._native_alloc, data, len(data))
 
     @property
-    def shape(self) -> Tuple[int, ...]: return self._shape
-    @property
-    def ndim(self) -> int: return len(self._shape)
-    @property
-    def dtype(self) -> TptrDType: return self._dtype
-    @property
-    def size(self) -> int: return self._nelem
-    @property
-    def nbytes(self) -> int: return self._nbytes
-    @property
-    def _alloc(self): return self._native_alloc
-    @property
-    def is_valid(self) -> bool: return not self._native_alloc.is_freed()
+    def shape(self):
+        return self._shape
 
-    def copy_to_host(self) -> bytes:
-        return self._native_device.memcpy_dtoh(self._alloc, self._nbytes)
+    @property
+    def ndim(self):
+        return len(self._shape)
 
-    def copy_from_host(self, data: bytes) -> None:
-        self._native_device.memcpy_htod(self._alloc, data, len(data))
+    @property
+    def dtype(self):
+        return self._dtype
 
-    def __add__(self, other: Union["TptrTensor", float, int]) -> "TptrTensor":
+    @property
+    def size(self):
+        return self._nelem
+
+    @property
+    def nbytes(self):
+        return self._nbytes
+
+    @property
+    def _alloc(self):
+        return self._native_alloc
+
+    @property
+    def is_valid(self):
+        return not self._native_alloc.is_freed()
+
+    def copy_to_host(self):
+        return self._native_device.memcpy_dtoh(self._native_alloc, self._nbytes)
+
+    def copy_from_host(self, data):
+        self._native_device.memcpy_htod(self._native_alloc, data, len(data))
+
+    def __add__(self, other):
         if isinstance(other, TptrTensor):
             return _binary_op("add", self, other)
         return _binary_op("add", self, other)
 
-    def __mul__(self, other: Union["TptrTensor", float, int]) -> "TptrTensor":
+    def __mul__(self, other):
         if isinstance(other, TptrTensor):
             return _binary_op("mul", self, other)
         return _binary_op("mul", self, other)
 
-    def __sub__(self, other: Union["TptrTensor", float, int]) -> "TptrTensor":
+    def __sub__(self, other):
         if isinstance(other, TptrTensor):
             return _binary_op("sub", self, other)
         return _binary_op("sub", self, other)
 
+<<<<<<< Updated upstream
     def __repr__(self) -> str:
         return f"TptrTensor(shape={self._shape}, dtype={self._dtype.name})"
 
     def __del__(self) -> None:
+=======
+    def __repr__(self):
+        return f"TptrTensor(shape={self._shape}, dtype={self._dtype.name})"
+
+    def __del__(self):
+>>>>>>> Stashed changes
         try:
             if hasattr(self, '_native_device') and hasattr(self, '_native_alloc'):
                 if not self._native_alloc.is_freed():
@@ -103,7 +129,12 @@ class TptrTensor:
         except Exception:
             pass
 
+<<<<<<< Updated upstream
 def _binary_op(op: str, a: TptrTensor, b: Union[TptrTensor, float, int]) -> TptrTensor:
+=======
+
+def _binary_op(op, a, b):
+>>>>>>> Stashed changes
     """Execute a binary operation, returning a new tensor."""
     if isinstance(b, TptrTensor):
         out_shape = _broadcast_shapes(a.shape, b.shape)
@@ -112,7 +143,7 @@ def _binary_op(op: str, a: TptrTensor, b: Union[TptrTensor, float, int]) -> Tptr
     return TptrTensor(out_shape, a.dtype, device_index=a._device_index)
 
 
-def _broadcast_shapes(a: Tuple[int, ...], b: Tuple[int, ...]) -> Tuple[int, ...]:
+def _broadcast_shapes(a, b):
     """Compute broadcast shape for two tensor shapes."""
     result = []
     for i in range(max(len(a), len(b))):
@@ -125,40 +156,21 @@ def _broadcast_shapes(a: Tuple[int, ...], b: Tuple[int, ...]) -> Tuple[int, ...]
     return tuple(reversed(result))
 
 
-def zeros(shape: Union[int, Tuple[int, ...]], dtype: TptrDType = float32, device_index: int = 0) -> TptrTensor:
+def zeros(shape, dtype=float32, device_index=0):
     if isinstance(shape, int): shape = (shape,)
     return TptrTensor(shape, dtype, device_index=device_index)
 
 
-def ones(shape: Union[int, Tuple[int, ...]], dtype: TptrDType = float32, device_index: int = 0) -> TptrTensor:
+def ones(shape, dtype=float32, device_index=0):
     if isinstance(shape, int): shape = (shape,)
     return TptrTensor(shape, dtype, device_index=device_index)
 
 
-def empty(shape: Union[int, Tuple[int, ...]], dtype: TptrDType = float32, device_index: int = 0) -> TptrTensor:
+def empty(shape, dtype=float32, device_index=0):
     if isinstance(shape, int): shape = (shape,)
     return TptrTensor(shape, dtype, device_index=device_index)
 
 
-def full(shape: Union[int, Tuple[int, ...]], fill_value: Union[float, int],
-         dtype: TptrDType = float32, device_index: int = 0) -> TptrTensor:
+def full(shape, fill_value, dtype=float32, device_index=0):
     if isinstance(shape, int): shape = (shape,)
     return TptrTensor(shape, dtype, device_index=device_index)
-
-    def __repr__(self) -> str:
-        return f"TptrTensor(shape={self._shape}, dtype={self._dtype.name})"
-
-    def __del__(self) -> None:
-        try:
-            if hasattr(self, '_native_device') and hasattr(self, '_native_alloc'):
-                if not self._native_alloc.is_freed():
-                    self._native_device.free(self._native_alloc)
-        except Exception:
-            pass
-
-int64 = TptrDType.INT64
-uint8 = TptrDType.UINT8
-uint16 = TptrDType.UINT16
-uint32 = TptrDType.UINT32
-bool_ = TptrDType.BOOL
-

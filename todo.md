@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # TPT GPU — Project Task Tracker
 
 **Platform:** Open-source, hardware-agnostic, full-stack GPU compute  
@@ -154,3 +155,110 @@
 - [ ] Custom silicon design — Layer 2 (tptd driver for new hardware)
 - [ ] Third-party hardware vendor support
 - [ ] TPT Script as recommended API (if adoption warrants)
+=======
+# TPT GPU — Project Task Tracker
+
+**Platform:** Open-source, hardware-agnostic, full-stack GPU compute  
+**License:** Apache 2.0 (with Express Patent Grant)  
+**Strategy:** Rust runtime · C++ compiler · SystemVerilog ISA · TPT Script (AI-native language)
+
+---
+
+## Phase 1 (Months 1–3): Core Infrastructure
+
+### Layer 1 — TPT ISA (SystemVerilog)
+- [x] Write TPT ISA specification document
+- [x] Implement ISA in SystemVerilog
+- [x] Build SystemVerilog testbench / simulation
+
+### Layer 2 — TPT Driver / tptd (C + Rust)
+- [x] Linux DRM kernel module (Rust for Linux, kernel 6.1+)
+- [x] Windows WDM driver (C)
+- [x] macOS DriverKit driver (C)
+- [x] User-space memory management components (Rust)
+- [x] Command submission interface (Rust)
+- [x] FFI boundary design between C and Rust components
+
+### Layer 3 — TPTIR Compiler Stack / tptc (C++ + Rust)
+- [x] Define TPTIR intermediate representation specification
+- [x] MLIR-compatible dialect definitions (C++ headers)
+- [x] Frontend parser / IR builder (C++)
+- [x] Optimization passes (C++) — canonicalize, DCE, constant fold, vectorize, tensor lowering
+- [x] Code generation backend (C++) — TPT ISA, LLVM IR, TPTIR text targets
+- [x] Clean FFI boundary design (C API + Rust FFI bindings)
+- [x] Begin parallel Rust port of critical compiler components (IR types, passes, parser)
+
+### Layer 4 — TPT Runtime / tptr (Rust)
+- [x] GPU memory allocator (Rust) - Slab, Buddy, Fallback
+- [x] Command queue / scheduler (Rust) - Priority-based with aging
+- [x] Kernel launch interface (Rust) - Config, ArgumentBuffer, Handle
+- [x] Python bindings via PyO3 - Device, Memory, Queue, Kernel
+- [x] Runtime error handling framework - TptrError with error codes
+
+### Layer 5 — TPT Primitives / tptp (TPTIR + Rust)
+- [x] Define TPTIR kernel interface / calling convention
+- [x] GEMM kernel (TPTIR)
+- [x] Attention kernel (TPTIR)
+- [x] Conv2D kernel (TPTIR)
+- [x] Rust host-side wrappers for each primitive
+- [x] Vendor library integration (cuBLAS / ROCm / Metal equivalent)
+
+### Layer 6 — Framework Backends (Python + Rust)
+- [x] Python thin wrapper over Rust runtime (tptr)
+- [x] PyTorch dispatch layer (Python)
+- [ ] JAX integration (Python)
+- [ ] Performance-critical dispatch paths (Rust)
+
+---
+
+## Phase 2 (Months 3–4): TPT Script Development
+
+### Language Specification
+- [x] Write TPT Script language specification document
+- [x] Define type system with semantic metadata annotations
+- [x] Define capability declaration system
+- [x] Define ~200 core operations (minimal, orthogonal API surface)
+
+### Lexer / Parser
+- [x] Implement lexer (tokenizer)
+- [x] Implement parser (AST generation)
+
+### Type System & Semantic Layer
+- [x] Define AST node types
+- [x] Implement type checker with tensor shape inference
+- [x] Implement constraint checker
+- [x] Implement semantic metadata extraction from annotations
+
+### Compiler Backend
+- [x] Emit Rust or LLVM IR from TPT Script AST
+- [x] Integration with TPTIR for GPU kernel emission
+
+### Introspection API (tpt.introspect)
+- [x] `list_operations()` — list all available operations
+- [x] `get_schema()` — return structured JSON schema for any operation
+- [x] `validate_code()` — check code validity before execution
+- [x] `get_capabilities()` — return hardware requirements for a function
+- [x] `get_current_estimated_memory()` — return current estimated VRAM usage
+
+### Tooling
+- [x] REPL (interactive interpreter)
+- [x] CLI tool (tpt CLI)
+- [x] Profiler tool
+- [x] Deployment tool
+
+---
+
+## Phase 3 (Months 4–6): Framework Integration & TPT Script Beta
+
+- [x] Complete PyTorch backend integration
+- [ ] Complete JAX backend integration
+- [x] Hugging Face integration (model loading / inference)
+- [ ] TPT Script beta release (advanced external users)
+- [ ] Distributed training examples (FSDP strategy, 8-GPU)
+- [ ] Edge deployment use case examples
+- [ ] LSP implementation (Language Server Protocol for IDE support)
+- [ ] TPT Script formatter / linter
+- [ ] VSCode extension (syntax highlighting, LSP client)
+- [ ] Gather beta user feedback and iterate
+- [ ] Write language documentation / user guide
+>>>>>>> Stashed changes

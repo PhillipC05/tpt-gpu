@@ -6,49 +6,17 @@ pub mod types;
 use std::collections::HashMap;
 
 use crate::ast::*;
+use crate::errors::{ErrorCode, ErrorContext, TptError};
 use crate::lexer::Span;
 
 use builtins::{ident_as_dtype, infer_builtin};
 use constraints::{eval_constraint, ConstraintResult, EvalEnv};
 use metadata::extract_function_metadata;
-use types::{TptType, TypeAnnotation};
+use types::{DimVal, TptType, TypeAnnotation};
 
+pub use crate::errors::TptError as TypeError;
 pub use metadata::{extract_function_metadata as fn_metadata, FunctionMeta};
 pub use types::TptType as SemType;
-
-// ---------------------------------------------------------------------------
-// TypeError
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, Clone)]
-pub struct TypeError {
-    pub code: &'static str,
-    pub message: String,
-    pub span: Span,
-    /// Optional suggested fix text.
-    pub suggestion: Option<String>,
-}
-
-impl TypeError {
-    fn new(code: &'static str, message: impl Into<String>, span: Span) -> Self {
-        Self { code, message: message.into(), span, suggestion: None }
-    }
-
-    fn with_suggestion(mut self, s: impl Into<String>) -> Self {
-        self.suggestion = Some(s.into());
-        self
-    }
-}
-
-impl std::fmt::Display for TypeError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "error[{}] at {}: {}", self.code, self.span, self.message)?;
-        if let Some(sug) = &self.suggestion {
-            write!(f, "\n  suggestion: {sug}")?;
-        }
-        Ok(())
-    }
-}
 
 // ---------------------------------------------------------------------------
 // Type environment (scope chain)
@@ -112,7 +80,7 @@ struct DimEnv {
 ///  4. Collects errors into `errors`.
 ///  5. Builds a `type_map` from span → inferred type for IDE integration.
 pub struct TypeChecker {
-    pub errors: Vec<TypeError>,
+    pub errors: Vec<TptError>,
     /// Maps (span.start, span.end) → inferred type for every expression.
     pub type_map: Vec<TypeAnnotation>,
     /// Top-level function signatures visible for forward references.
@@ -197,20 +165,21 @@ impl TypeChecker {
                     // At declaration time all dims are symbolic → Symbolic result.
                     // A Known(false) here would be a compile-time contradiction.
                     if eval_constraint(expr, &eval_env) == ConstraintResult::Known(false) {
-                        self.errors.push(TypeError::new(
-                            "CONSTRAINT_VIOLATION",
+                        self.errors.push(TptError::new(
+                            ErrorCode::ConstraintViolation,
                             format!(
                                 "Constraint '{}' is statically false{}",
                                 c.expr_str,
                                 c.error_msg.as_deref().map(|m| format!(": {m}")).unwrap_or_default()
                             ),
                             f.span.clone(),
-                        ));
+                        ).with_context(ErrorContext::new()
+                            .with("constraint_expr", c.expr_str.clone())));
                     }
                 }
                 Err(e) => {
-                    self.errors.push(TypeError::new(
-                        "PARSE_ERROR",
+                    self.errors.push(TptError::new(
+                        ErrorCode::ParseError,
                         format!("Could not parse constraint '{}': {e}", c.expr_str),
                         f.span.clone(),
                     ));
@@ -242,15 +211,17 @@ impl TypeChecker {
                 if let Some(declared) = &l.ty {
                     let declared_ty = TptType::from_ast(declared);
                     if !inferred.compatible(&declared_ty) {
-                        self.errors.push(TypeError::new(
-                            "TYPE_ERROR",
+                        let (code, ctx) =
+                            mismatch_code_and_ctx(&inferred, &declared_ty, &l.name);
+                        self.errors.push(TptError::new(
+                            code,
                             format!(
                                 "Type mismatch in `let {name}`: declared `{declared_ty}`, \
                                  inferred `{inferred}`",
                                 name = l.name,
                             ),
                             l.span.clone(),
-                        ));
+                        ).with_context(ctx));
                     }
                     env.define(&l.name, declared_ty);
                 } else {
@@ -263,13 +234,16 @@ impl TypeChecker {
                     .map(|e| self.infer_expr(e, env))
                     .unwrap_or(TptType::Unit);
                 if !actual.compatible(expected_ret) {
-                    self.errors.push(TypeError::new(
-                        "TYPE_ERROR",
+                    let ctx = ErrorContext::new()
+                        .with("expected_type", format!("{expected_ret}"))
+                        .with("found_type", format!("{actual}"));
+                    self.errors.push(TptError::new(
+                        ErrorCode::ReturnTypeMismatch,
                         format!(
                             "Return type mismatch: expected `{expected_ret}`, found `{actual}`"
                         ),
                         r.span.clone(),
-                    ));
+                    ).with_context(ctx));
                 }
             }
 
@@ -308,11 +282,12 @@ impl TypeChecker {
                         if self.global_fns.contains_key(name) {
                             return TptType::Unknown; // function reference
                         }
-                        self.errors.push(TypeError::new(
-                            "UNDEFINED_VARIABLE",
+                        self.errors.push(TptError::new(
+                            ErrorCode::UndefinedVariable,
                             format!("Undefined variable `{name}`"),
                             expr.span.clone(),
-                        ).with_suggestion(format!("Did you mean to declare `let {name} = ...`?")));
+                        ).with_context(ErrorContext::new().with("name", name))
+                         .with_suggestion(format!("Did you mean to declare `let {name} = ...`?")));
                         TptType::Unknown
                     }
                 }
@@ -328,11 +303,13 @@ impl TypeChecker {
                 for elem in &elems[1..] {
                     let ty = self.infer_expr(elem, env);
                     if !ty.compatible(&first_ty) {
-                        self.errors.push(TypeError::new(
-                            "TYPE_ERROR",
+                        self.errors.push(TptError::new(
+                            ErrorCode::TypeError,
                             format!("Array literal has mixed types: `{first_ty}` and `{ty}`"),
                             elem.span.clone(),
-                        ));
+                        ).with_context(ErrorContext::new()
+                            .with("expected_type", format!("{first_ty}"))
+                            .with("found_type", format!("{ty}"))));
                     }
                 }
                 TptType::Slice(Box::new(first_ty))
@@ -343,21 +320,23 @@ impl TypeChecker {
                 match op {
                     UnOp::Neg => {
                         if !ty.is_numeric() && !ty.is_tensor() && ty != TptType::Unknown {
-                            self.errors.push(TypeError::new(
-                                "TYPE_ERROR",
+                            self.errors.push(TptError::new(
+                                ErrorCode::TypeError,
                                 format!("Unary `-` requires a numeric type, found `{ty}`"),
                                 expr.span.clone(),
-                            ));
+                            ).with_context(ErrorContext::new().with("found_type", format!("{ty}"))));
                         }
                         ty
                     }
                     UnOp::Not => {
                         if ty != TptType::Bool && !ty.is_tensor() && ty != TptType::Unknown {
-                            self.errors.push(TypeError::new(
-                                "TYPE_ERROR",
+                            self.errors.push(TptError::new(
+                                ErrorCode::TypeError,
                                 format!("Unary `!` requires bool, found `{ty}`"),
                                 expr.span.clone(),
-                            ));
+                            ).with_context(ErrorContext::new()
+                                .with("expected_type", "bool")
+                                .with("found_type", format!("{ty}"))));
                         }
                         TptType::Bool
                     }
@@ -402,11 +381,12 @@ impl TypeChecker {
                     TptType::Fn { ret, .. } => *ret.clone(),
                     TptType::Unknown => TptType::Unknown,
                     _ => {
-                        self.errors.push(TypeError::new(
-                            "TYPE_ERROR",
+                        self.errors.push(TptError::new(
+                            ErrorCode::NotCallable,
                             format!("Expression of type `{callee_ty}` is not callable"),
                             callee.span.clone(),
-                        ));
+                        ).with_context(ErrorContext::new()
+                            .with("found_type", format!("{callee_ty}"))));
                         TptType::Unknown
                     }
                 }
@@ -420,11 +400,11 @@ impl TypeChecker {
                                        | TptType::U8 | TptType::U16 | TptType::U32 | TptType::U64
                                        | TptType::Index | TptType::Unknown)
                     {
-                        self.errors.push(TypeError::new(
-                            "TYPE_ERROR",
+                        self.errors.push(TptError::new(
+                            ErrorCode::InvalidIndexType,
                             format!("Index must be an integer type, found `{idx_ty}`"),
                             idx.span.clone(),
-                        ));
+                        ).with_context(ErrorContext::new().with("found_type", format!("{idx_ty}"))));
                     }
                 }
                 // Subscript of a tensor reduces rank by number of full indices.
@@ -459,11 +439,13 @@ impl TypeChecker {
             ExprKind::If { condition, then_block, else_branch } => {
                 let cond_ty = self.infer_expr(condition, env);
                 if cond_ty != TptType::Bool && cond_ty != TptType::Unknown {
-                    self.errors.push(TypeError::new(
-                        "TYPE_ERROR",
+                    self.errors.push(TptError::new(
+                        ErrorCode::TypeError,
                         format!("If condition must be bool, found `{cond_ty}`"),
                         condition.span.clone(),
-                    ));
+                    ).with_context(ErrorContext::new()
+                        .with("expected_type", "bool")
+                        .with("found_type", format!("{cond_ty}"))));
                 }
                 let mut env2 = env.clone();
                 self.check_block(then_block, &mut env2, &TptType::Unknown);
@@ -492,11 +474,13 @@ impl TypeChecker {
             ExprKind::While { condition, body } => {
                 let cond_ty = self.infer_expr(condition, env);
                 if cond_ty != TptType::Bool && cond_ty != TptType::Unknown {
-                    self.errors.push(TypeError::new(
-                        "TYPE_ERROR",
+                    self.errors.push(TptError::new(
+                        ErrorCode::TypeError,
                         format!("While condition must be bool, found `{cond_ty}`"),
                         condition.span.clone(),
-                    ));
+                    ).with_context(ErrorContext::new()
+                        .with("expected_type", "bool")
+                        .with("found_type", format!("{cond_ty}"))));
                 }
                 let mut env2 = env.clone();
                 self.check_block(body, &mut env2, &TptType::Unknown);
@@ -548,11 +532,13 @@ impl TypeChecker {
             // Logical → bool
             BinOp::And | BinOp::Or => {
                 if lt != &TptType::Bool && *lt != TptType::Unknown {
-                    self.errors.push(TypeError::new(
-                        "TYPE_ERROR",
+                    self.errors.push(TptError::new(
+                        ErrorCode::TypeError,
                         format!("`{op}` requires bool operands, left is `{lt}`"),
                         span.clone(),
-                    ));
+                    ).with_context(ErrorContext::new()
+                        .with("expected_type", "bool")
+                        .with("found_type", format!("{lt}"))));
                 }
                 TptType::Bool
             }
@@ -566,11 +552,14 @@ impl TypeChecker {
                 if lt.is_tensor() { return lt.clone(); }
                 if rt.is_tensor() { return rt.clone(); }
                 if !lt.compatible(rt) && *lt != TptType::Unknown && *rt != TptType::Unknown {
-                    self.errors.push(TypeError::new(
-                        "TYPE_ERROR",
+                    self.errors.push(TptError::new(
+                        ErrorCode::TypeError,
                         format!("Type mismatch: `{lt}` {op} `{rt}`"),
                         span.clone(),
-                    ).with_suggestion(format!("Use `tpt.cast(x, dtype=...)` to align types")));
+                    ).with_context(ErrorContext::new()
+                        .with("expected_type", format!("{lt}"))
+                        .with("found_type", format!("{rt}")))
+                     .with_suggestion("Use `tpt.cast(x, dtype=...)` to align types"));
                 }
                 if *lt != TptType::Unknown { lt.clone() } else { rt.clone() }
             }
@@ -587,12 +576,14 @@ impl TypeChecker {
             // Unknown → don't error (field access on Unknown is valid)
             (TptType::Unknown, _) => TptType::Unknown,
             // Anything else: warn but allow for forward compat.
-            (ty, f) => {
-                self.errors.push(TypeError::new(
-                    "TYPE_ERROR",
-                    format!("Type `{ty}` has no field `{f}`"),
+            (ty, field_name) => {
+                self.errors.push(TptError::new(
+                    ErrorCode::TypeError,
+                    format!("Type `{ty}` has no field `{field_name}`"),
                     span.clone(),
-                ));
+                ).with_context(ErrorContext::new()
+                    .with("type_name", format!("{ty}"))
+                    .with("field", field_name)));
                 TptType::Unknown
             }
         }
@@ -624,11 +615,13 @@ impl TypeChecker {
                 // Try builtin registry as a fallback (covers model/tensor methods).
                 let result = infer_builtin(method, arg_tys, &named_refs);
                 if result == TptType::Unknown {
-                    self.errors.push(TypeError::new(
-                        "UNDEFINED_OPERATION",
+                    self.errors.push(TptError::new(
+                        ErrorCode::UndefinedOperation,
                         format!("Method `{method}` not found on type `{obj_ty}`"),
                         span.clone(),
-                    ));
+                    ).with_context(ErrorContext::new()
+                        .with("method_name", method)
+                        .with("type_name", format!("{obj_ty}"))));
                 }
                 result
             }
@@ -643,6 +636,49 @@ impl Default for TypeChecker {
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/// Classify a type mismatch into the most specific [`ErrorCode`] and build
+/// the corresponding [`ErrorContext`] so the auto-fix engine can act on it.
+fn mismatch_code_and_ctx(
+    found:    &TptType,
+    expected: &TptType,
+    var_name: &str,
+) -> (ErrorCode, ErrorContext) {
+    match (found, expected) {
+        (
+            TptType::Tensor { dtype: d1, shape: s1 },
+            TptType::Tensor { dtype: d2, shape: s2 },
+        ) => {
+            if d1 != d2 {
+                (
+                    ErrorCode::DtypeMismatch,
+                    ErrorContext::new()
+                        .with("var_name", var_name)
+                        .with("expected_dtype", format!("{d2}"))
+                        .with("found_dtype",    format!("{d1}")),
+                )
+            } else {
+                let fmt_shape = |s: &[DimVal]| {
+                    format!("[{}]", s.iter().map(|d| d.to_string()).collect::<Vec<_>>().join(", "))
+                };
+                (
+                    ErrorCode::ShapeMismatch,
+                    ErrorContext::new()
+                        .with("var_name",       var_name)
+                        .with("expected_shape", fmt_shape(s2))
+                        .with("found_shape",    fmt_shape(s1)),
+                )
+            }
+        }
+        _ => (
+            ErrorCode::TypeError,
+            ErrorContext::new()
+                .with("var_name",      var_name)
+                .with("expected_type", format!("{expected}"))
+                .with("found_type",    format!("{found}")),
+        ),
+    }
+}
 
 fn collect_dim_names(ty: &Type, out: &mut HashMap<String, ()>) {
     if let Type::Tensor { dims, .. } = ty {
@@ -673,6 +709,7 @@ pub fn type_check(program: &Program) -> TypeChecker {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::errors::ErrorCode;
     use crate::{lexer::tokenize, parser::parse};
 
     fn check(src: &str) -> TypeChecker {
@@ -689,7 +726,7 @@ mod tests {
     #[test]
     fn test_undefined_variable() {
         let c = check("fn f() { let x = y }");
-        assert!(c.errors.iter().any(|e| e.code == "UNDEFINED_VARIABLE"));
+        assert!(c.errors.iter().any(|e| e.code == ErrorCode::UndefinedVariable));
     }
 
     #[test]
@@ -709,21 +746,21 @@ mod tests {
         // f32 return declared, but we return an i64 literal
         let c = check("fn f() -> f32 { return 42 }");
         // 42 is inferred as i64; f32 declared → mismatch
-        assert!(c.errors.iter().any(|e| e.code == "TYPE_ERROR"),
-                "expected TYPE_ERROR, got: {:?}", c.errors);
+        assert!(c.errors.iter().any(|e| e.code == ErrorCode::ReturnTypeMismatch),
+                "expected RETURN_TYPE_MISMATCH, got: {:?}", c.errors);
     }
 
     #[test]
     fn test_if_condition_not_bool() {
         let c = check("fn f() { if 42 { } }");
-        assert!(c.errors.iter().any(|e| e.code == "TYPE_ERROR"),
+        assert!(c.errors.iter().any(|e| e.code == ErrorCode::TypeError),
                 "expected TYPE_ERROR for non-bool condition");
     }
 
     #[test]
     fn test_let_type_mismatch() {
         let c = check("fn f() { let x: f32 = true }");
-        assert!(c.errors.iter().any(|e| e.code == "TYPE_ERROR"));
+        assert!(c.errors.iter().any(|e| e.code == ErrorCode::TypeError));
     }
 
     #[test]
@@ -775,7 +812,7 @@ fn matmul(a: Tensor[f32, m, k], b: Tensor[f32, k, n]) -> Tensor[f32, m, n] {
 fn broken() {}
 "#;
         let c = check(src);
-        assert!(c.errors.iter().any(|e| e.code == "CONSTRAINT_VIOLATION"),
+        assert!(c.errors.iter().any(|e| e.code == ErrorCode::ConstraintViolation),
                 "expected CONSTRAINT_VIOLATION");
     }
 

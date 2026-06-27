@@ -10,8 +10,9 @@ import sys
 import warnings
 import importlib.util
 
-# Try to import the native Rust extension
+# Try to import the native Rust extension (not the local tptr package)
 _native_ext = None
+<<<<<<< Updated upstream
 
 # First, try to find the native extension in the target directory
 # The native extension is built by tptr-py in layer4_tptr
@@ -47,6 +48,33 @@ _native_ext = _find_native_extension()
 
 if _native_ext is not None:
     # Re-export all native types from the native extension
+=======
+try:
+    # First check if there's a compiled extension in the build output
+    _ext_path = os.path.join(os.path.dirname(__file__), "..", "..", "target", "release")
+    if os.path.exists(_ext_path):
+        _orig_path = sys.path.copy()
+        try:
+            sys.path.insert(0, _ext_path)
+            import tptr as _native_ext  # type: ignore
+        finally:
+            sys.path[:] = _orig_path
+except ImportError:
+    pass
+
+# If no native extension found, check if we can import a top-level tptr
+if _native_ext is None:
+    try:
+        import importlib.util
+        _spec = importlib.util.find_spec("tptr")
+        if _spec is not None and _spec.origin and "_ffi" not in _spec.origin:
+            import tptr as _native_ext  # type: ignore
+    except (ImportError, AttributeError):
+        pass
+
+if _native_ext is not None and hasattr(_native_ext, "Device"):
+    # Re-export all native types
+>>>>>>> Stashed changes
     Device = _native_ext.Device
     MemoryAllocation = _native_ext.MemoryAllocation
     CommandQueue = _native_ext.CommandQueue
@@ -71,4 +99,3 @@ else:
         KernelHandle,
         TptrError,
     )
-

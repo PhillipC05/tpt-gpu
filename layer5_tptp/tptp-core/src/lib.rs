@@ -13,16 +13,19 @@ pub mod vendor;
 pub mod tptir;
 
 pub use error::{TptpError, TptpResult};
-pub use kernel::{PrimitiveKernel, KernelConfig, KernelDispatch};
+pub use kernel::{PrimitiveKernel, KernelConfig, KernelDispatch, KernelBuilder, KernelResult};
 pub use memory::{GpuBuffer, BufferFlags, DType};
 pub use kernels::{GemmKernel, AttentionKernel, Conv2DKernel};
+pub use kernels::gemm::GemmParams;
+pub use kernels::attention::AttentionParams;
+pub use kernels::conv2d::Conv2DParams;
 pub use vendor::{VendorBackend, VendorLibrary};
 pub use tptir::{TptirCompiler, CompilationOptions, CompilationTarget};
 
 /// Re-export commonly used types
 pub mod prelude {
     pub use crate::{TptpError, TptpResult, GpuBuffer, DType, BufferFlags};
-    pub use crate::kernel::{PrimitiveKernel, KernelConfig};
+    pub use crate::kernel::{PrimitiveKernel, KernelConfig, KernelBuilder, KernelResult};
     pub use crate::kernels::{GemmKernel, AttentionKernel, Conv2DKernel};
     pub use crate::vendor::VendorBackend;
 }

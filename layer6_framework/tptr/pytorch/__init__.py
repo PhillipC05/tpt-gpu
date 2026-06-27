@@ -26,7 +26,6 @@ import warnings
 
 from tptr._ffi import TptrError
 
-
 # TPT device type string for PyTorch
 TPT_DEVICE_TYPE = "tpt"
 
@@ -43,10 +42,6 @@ def is_available() -> bool:
 def register_backend() -> bool:
     """
     Register TPT as a PyTorch backend.
-
-    This registers the TPT device with PyTorch's dispatch system,
-    allowing tensor operations to be routed through TPT.
-
     Returns True if registration succeeded.
     """
     try:
@@ -54,9 +49,7 @@ def register_backend() -> bool:
     except ImportError:
         warnings.warn("PyTorch not installed. Cannot register TPT backend.")
         return False
-
     try:
-        # Register the device with PyTorch
         if hasattr(torch, "_register_device_backend"):
             torch._register_device_backend(TPT_DEVICE_TYPE, _dispatch_impl)
         return True
@@ -142,3 +135,24 @@ class TptrNativeTensor:
         dev = NativeDevice(0)
         dev.memcpy_htod(self._alloc, data, size)
 
+
+# Re-exports from sub-modules
+from tptr.pytorch.tensor import TptrTorchTensor, from_torch, to_torch
+from tptr.pytorch.autograd import (
+    TptFunction, TptAddFunction, TptMulFunction,
+    TptMatmulFunction, TptReluFunction,
+    tpt_add, tpt_mul, tpt_matmul, tpt_relu,
+)
+from tptr.pytorch.stream import TptStream, TptEvent, StreamContext, get_stream, default_stream
+from tptr.pytorch.hf_bridge import is_hf_available, load_model, load_tokenizer, run_inference, TptHFModel
+
+__all__ = [
+    "is_available", "register_backend", "get_tpt_device",
+    "TptrTorchDevice", "TptrNativeTensor",
+    "TptrTorchTensor", "from_torch", "to_torch",
+    "TptFunction", "TptAddFunction", "TptMulFunction",
+    "TptMatmulFunction", "TptReluFunction",
+    "tpt_add", "tpt_mul", "tpt_matmul", "tpt_relu",
+    "TptStream", "TptEvent", "StreamContext", "get_stream", "default_stream",
+    "is_hf_available", "load_model", "load_tokenizer", "run_inference", "TptHFModel",
+]
