@@ -14,12 +14,12 @@
 - [x] Build SystemVerilog testbench / simulation
 
 ### Layer 2 — TPT Driver / tptd (C + Rust)
-- [ ] Linux DRM kernel module (Rust for Linux, kernel 6.1+)
-- [ ] Windows WDM driver (C)
-- [ ] macOS DriverKit driver (C)
-- [ ] User-space memory management components (Rust)
-- [ ] Command submission interface (Rust)
-- [ ] FFI boundary design between C and Rust components
+- [x] Linux DRM kernel module (Rust for Linux, kernel 6.1+)
+- [x] Windows WDM driver (C)
+- [x] macOS DriverKit driver (C)
+- [x] User-space memory management components (Rust)
+- [x] Command submission interface (Rust)
+- [x] FFI boundary design between C and Rust components
 
 ### Layer 3 — TPTIR Compiler Stack / tptc (C++ + Rust)
 - [ ] Define TPTIR intermediate representation specification

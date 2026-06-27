@@ -1,4 +1,18 @@
-// =============================================================================
+#!/usr/bin/env python3
+"""Generate Layer 3 source files - Part 1: Headers"""
+import os
+
+BASE = r"d:\Programming\1PRODUCTION\Open Source\tpt-gpu\layer3_tptc"
+
+def write(path, content):
+    full = os.path.join(BASE, path)
+    os.makedirs(os.path.dirname(full), exist_ok=True)
+    with open(full, 'w', encoding='utf-8', newline='\n') as f:
+        f.write(content)
+    print(f"wrote {path}")
+
+# TPTIRDialect.h
+write("include/tptir/Dialect/TPTIRDialect.h", """// =============================================================================
 // TPTIRDialect.h — TPTIR MLIR-Compatible Dialect Definition
 // =============================================================================
 // TPT GPU — Tensor Processing Technology
@@ -135,3 +149,5 @@ bool isTPTIRDialectRegistered();
 } // namespace tptir
 
 #endif // TPTIR_DIALECT_TPTIRDIALECT_H
+""")
+print("Part 1 done")
