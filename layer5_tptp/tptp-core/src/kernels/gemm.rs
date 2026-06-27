@@ -27,7 +27,7 @@ impl GemmKernel {
         self
     }
 
-    pub fn execute(&self, a: &GpuBuffer<f32>, b: &GpuBuffer<f32>, c: Option<&mut GpuBuffer<f32>>, alpha: f32, beta: f32) -> TptpResult<GpuBuffer<f32>> {
+    pub fn execute(&self, a: &GpuBuffer<f32>, b: &GpuBuffer<f32>, mut c: Option<&mut GpuBuffer<f32>>, alpha: f32, beta: f32) -> TptpResult<GpuBuffer<f32>> {
         if a.ndim() != 2 || b.ndim() != 2 {
             return Err(TptpError::shape_error("GEMM requires 2D matrices"));
         }
@@ -40,7 +40,7 @@ impl GemmKernel {
         }
         let k = k_a;
         let mut output_owned;
-        let mut output: &mut GpuBuffer<f32> = if let Some(ref mut c) = c {
+        let output: &mut GpuBuffer<f32> = if let Some(ref mut c) = c {
             if c.dim(0) != Some(m) || c.dim(1) != Some(n) {
                 return Err(TptpError::shape_error(format!("C shape [{},{}] does not match output [{},{}]", c.dim(0).unwrap_or(0), c.dim(1).unwrap_or(0), m, n)));
             }
