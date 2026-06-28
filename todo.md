@@ -135,16 +135,17 @@
 - [x] Conv3D kernel — generated via `kernel-generator`
 - [x] BatchNorm / LayerNorm / GroupNorm kernels — generated via `kernel-generator`
 - [x] Expand primitive set to cover core ML workloads (generated)
-- [ ] TPT Script v1.0 public release
+- [x] TPT Script v1.0 public release (June 28, 2026)
 - [x] TPT Script standard library (complete)
-- [ ] Comprehensive tutorial series
+- [x] Comprehensive tutorial series
 - [ ] Public developer portal / documentation website
-- [ ] Web-based compiler playground (`tools/tpt-playground/`): TPT Script → TPTIR + perf estimate (sim mode)
+- [x] Web-based compiler playground (`tools/tpt-playground/`): TPT Script → TPTIR + perf estimate (sim mode)
 
 ---
 
 ## Phase 5 (Year 1+): Ecosystem & Custom Silicon
 
+<<<<<<< Updated upstream
 - [x] GEMM ≥ 90% cuBLAS efficiency milestone (optimizer loop)
 - [ ] GEMM > cuBLAS on at least one problem size (AI-guided + fusion)
 - [x] Attention ≥ 90% FlashAttention v2 efficiency milestone (optimizer loop: grid → hill-climb → AI-guided; `tools/kernel-optimizer/` — `bench-attention` CLI command)
@@ -156,3 +157,11 @@
 - [ ] Custom silicon design — Layer 2 (tptd driver for new hardware)
 - [ ] Third-party hardware vendor support
 - [ ] TPT Script as recommended API (if adoption warrants)
+
+### TPT-GenBench — User-Runnable Dynamic Benchmark Suite
+- [ ] `tools/tpt-bench/` crate: user-configurable `bench.toml` → dynamic workload matrix → per-GPU results JSON
+- [ ] Auto-detect GPU model at run time; load matching `tuning/<gpu>.json` or fall back to sim baseline
+- [ ] `tpt-bench --contribute` flow: write candidate `tuning/<gpu>.json` + print PR submission instructions
+- [ ] `tuning/schema.json`: JSON schema for GPU profiles + CI validation job on `tuning/` PRs (`.github/workflows/validate-profiles.yml`)
+- [ ] Correctness gate in benchmark: scalar reference check before reporting performance numbers
+- [ ] Community scoreboard: auto-update `BENCHMARKS.md` from submitted `results/<gpu>-<ts>.json` files
