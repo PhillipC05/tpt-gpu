@@ -77,6 +77,17 @@ enum Commands {
         #[arg(long, short)]
         output: Option<std::path::PathBuf>,
     },
+    /// Run the Attention >= 90% FlashAttention v2 efficiency milestone optimizer loop
+    BenchAttention {
+        #[arg(long, default_value = "90.0")]
+        target: f64,
+        #[arg(long)]
+        ai: bool,
+        #[arg(long, default_value = "10")]
+        ai_iters: usize,
+        #[arg(long, short)]
+        output: Option<std::path::PathBuf>,
+    },
 }
 
 
@@ -93,6 +104,9 @@ fn main() -> anyhow::Result<()> {
         }
         Commands::Bench { target, ai, ai_iters, output } => {
             handle_bench(target, ai, ai_iters, output)
+        }
+        Commands::BenchAttention { target, ai, ai_iters, output } => {
+            handle_bench_attention(target, ai, ai_iters, output)
         }
     }
 }
@@ -199,6 +213,38 @@ fn handle_bench(
     let results = optimize_all_gemm_problems(target, ai, ai_iters);
     let report_md = generate_milestone_report(&results, target);
     let report_json = generate_milestone_json(&results, target);
+    println!("\n{}", report_md);
+    if let Some(path) = output {
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("md");
+        let content = match ext {
+            "json" => serde_json::to_string_pretty(&report_json).expect("failed to serialize"),
+            _ => report_md,
+        };
+        std::fs::write(&path, content).expect("failed to write output file");
+        println!("Report written to: {}", path.display());
+    }
+    let all_pass = results.iter().all(|r| r.meets_target);
+    if !all_pass {
+        eprintln!("\nMilestone NOT achieved: some problem sizes below {:.1}%", target);
+        std::process::exit(1);
+    } else {
+        eprintln!("\nMilestone ACHIEVED: all problem sizes >= {:.1}%", target);
+    }
+    Ok(())
+}
+
+fn handle_bench_attention(
+    target: f64, ai: bool, ai_iters: usize,
+    output: Option<std::path::PathBuf>,
+) -> anyhow::Result<()> {
+    println!("Attention >= 90% FlashAttention v2 Efficiency Milestone");
+    println!("=======================================================");
+    println!("Target efficiency: {:.1}%", target);
+    println!("AI-guided phase: {}", if ai { "enabled" } else { "disabled" });
+    println!();
+    let results = optimize_all_attention_problems(target, ai, ai_iters);
+    let report_md = generate_attention_milestone_report(&results, target);
+    let report_json = generate_attention_milestone_json(&results, target);
     println!("\n{}", report_md);
     if let Some(path) = output {
         let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("md");

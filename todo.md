@@ -147,9 +147,9 @@
 
 - [x] GEMM ≥ 90% cuBLAS efficiency milestone (optimizer loop)
 - [ ] GEMM > cuBLAS on at least one problem size (AI-guided + fusion)
-- [ ] Attention ≥ 90% FlashAttention v2 efficiency milestone
+- [x] Attention ≥ 90% FlashAttention v2 efficiency milestone (optimizer loop: grid → hill-climb → AI-guided; `tools/kernel-optimizer/` — `bench-attention` CLI command)
 - [ ] Extend optimizer + generator to all kernels (Attention, Conv2D, and generated kernels)
-- [ ] Hardware-profile tuning database (`tuning/`) covering ≥5 common GPU models (community-contributed)
+- [x] Hardware-profile tuning database (`tuning/`) covering ≥5 common GPU models (community-contributed)
 - [ ] Automated CI regression: efficiency drop > 5% on any kernel blocks merge
 - [ ] Auto-generated `BENCHMARKS.md` scoreboard (committed to repo by CI after each run)
 - [ ] Custom silicon design — Layer 1 (TPT ISA for new hardware)

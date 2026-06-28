@@ -43,3 +43,7 @@ path = "src/examples/profile_attention.rs"
 [[example]]
 name = "profile_conv2d"
 path = "src/examples/profile_conv2d.rs"
+
+[[example]]
+name = "ci_regression"
+path = "src/examples/ci_regression.rs"

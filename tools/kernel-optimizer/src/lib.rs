@@ -17,6 +17,11 @@ pub use real_evaluator::{
     standard_gemm_problems, optimize_gemm_problem, optimize_all_gemm_problems,
     generate_milestone_report, generate_milestone_json,
 };
+pub use real_evaluator::{
+    RealAttentionEvaluator, AttentionProblemConfig, AttentionOptResult,
+    standard_attention_problems, optimize_attention_problem, optimize_all_attention_problems,
+    generate_attention_milestone_report, generate_attention_milestone_json,
+};
 
 // ---------------------------------------------------------------------------
 
@@ -107,6 +112,18 @@ impl ParamSpace {
         ])
     }
 
+    /// Default Attention tuning space (~512 configurations).
+    pub fn attention_default() -> Self {
+        Self::new(vec![
+            ParamDim::powers_of_two("tile_seq", 16, 128),
+            ParamDim::powers_of_two("tile_head", 4, 64),
+            ParamDim::powers_of_two("tile_k", 16, 64),
+            ParamDim::powers_of_two("vec_width", 1, 8),
+            ParamDim::new("unroll", vec![1, 2, 4, 8]),
+        ])
+    }
+
+    /// Number of configurations (Cartesian product size).
     /// Number of configurations (Cartesian product size).
     pub fn total_configs(&self) -> usize {
         self.dims.iter().map(|d| d.values.len()).product()
@@ -445,5 +462,45 @@ mod tests {
         let initial_score = eval.evaluate(&start);
         let result = hill_climb(&space, &start, &eval, 50);
         assert!(result.score >= initial_score);
+    }
+
+    // ---------------------------------------------------------------------------
+    // Attention evaluator tests
+    // ---------------------------------------------------------------------------
+
+    #[test]
+    fn test_attention_param_space_total() {
+        let space = ParamSpace::attention_default();
+        let expected: usize = space.dims.iter().map(|d| d.values.len()).product();
+        assert_eq!(space.total_configs(), expected);
+        assert!(expected > 0);
+    }
+
+    #[test]
+    fn test_attention_evaluator_reasonable_efficiency() {
+        let problem = AttentionProblemConfig::new(1024, 64, 1.0);
+        let eval = RealAttentionEvaluator::new(problem);
+        let params = TuningParams(HashMap::from([
+            ("tile_seq".to_string(), 64),
+            ("tile_head".to_string(), 16),
+            ("tile_k".to_string(), 32),
+            ("vec_width".to_string(), 4),
+            ("unroll".to_string(), 4),
+        ]));
+        let eff = eval.evaluate_efficiency(&params);
+        assert!(eff > 0.0, "Efficiency should be positive, got {}", eff);
+    }
+
+    #[test]
+    fn test_attention_problems_standard_count() {
+        let problems = standard_attention_problems();
+        assert_eq!(problems.len(), 8, "Should have 8 standard attention problems");
+    }
+
+    #[test]
+    fn test_attention_problem_gflops() {
+        let p = AttentionProblemConfig::new(1024, 64, 1.0);
+        let expected = 4.0 * 1024.0 * 1024.0 * 64.0;
+        assert_eq!(p.gflops(), expected);
     }
 }

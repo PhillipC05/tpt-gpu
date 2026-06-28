@@ -22,6 +22,19 @@ package tpt_pkg;
   parameter int NUM_CTAS        = 16;       // Maximum concurrent CTAs
 
   //--------------------------------------------------------------------------
+  // Silicon-specific Parameters
+  //--------------------------------------------------------------------------
+  parameter int ADDR_WIDTH      = 48;       // Virtual address width
+  parameter int PHYS_ADDR_WIDTH = 40;       // Physical address width
+  parameter int ICACHE_SIZE     = 32768;    // 32 KB I-Cache
+  parameter int DCACHE_SIZE     = 32768;    // 32 KB D-Cache
+  parameter int CACHE_LINE_SIZE = 64;       // 64-byte cache lines
+  parameter int BTB_ENTRIES     = 4096;     // Branch Target Buffer entries
+  parameter int RAS_DEPTH       = 16;       // Return Address Stack depth
+  parameter int TLB_ENTRIES     = 64;       // ITLB/DTLB entries
+  parameter int NUM_SM_DEFAULT  = 1;        // Default number of SMs
+
+  //--------------------------------------------------------------------------
   // Instruction Format Bit Positions
   //--------------------------------------------------------------------------
   // Common fields
