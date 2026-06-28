@@ -7,6 +7,33 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+// ---------------------------------------------------------------------------
+// Real-hardware GEMM evaluator (cuBLAS efficiency milestone)
+// ---------------------------------------------------------------------------
+
+pub mod real_evaluator;
+pub use real_evaluator::{
+    RealGemmEvaluator, GemmProblemConfig, GemmOptResult,
+    standard_gemm_problems, optimize_gemm_problem, optimize_all_gemm_problems,
+    generate_milestone_report, generate_milestone_json,
+};
+
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// TuningParams convenience constructors
+// ---------------------------------------------------------------------------
+
+impl<const N: usize> From<[(&'static str, u32); N]> for TuningParams {
+    fn from(arr: [(&'static str, u32); N]) -> Self {
+        let mut map = HashMap::with_capacity(N);
+        for (k, v) in arr {
+            map.insert(k.to_string(), v);
+        }
+        TuningParams(map)
+    }
+}
+// Parameter types
 
 // ---------------------------------------------------------------------------
 // Parameter types

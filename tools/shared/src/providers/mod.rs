@@ -69,6 +69,16 @@ pub trait AiProvider: Send + Sync {
             r.text().unwrap_or("").to_string()
         })
     }
+
+    /// Simple single-shot completion: prompt string → response text.
+    ///
+    /// This is a convenience method used by `tools/kernel-optimizer` and
+    /// `tools/kernel-generator` for simple prompt → response flows.
+    /// It builds a single-user-message [`AiRequest`] and returns the text.
+    fn generate(&self, prompt: &str) -> Result<String, AiError> {
+        let request = AiRequest::new(self.default_model(), prompt);
+        self.complete(&request).map(|r| r.text().unwrap_or("").to_string())
+    }
 }
 
 /// Provider factory for creating AI providers from configuration

@@ -145,7 +145,7 @@
 
 ## Phase 5 (Year 1+): Ecosystem & Custom Silicon
 
-- [ ] GEMM ≥ 90% cuBLAS efficiency milestone (optimizer loop)
+- [x] GEMM ≥ 90% cuBLAS efficiency milestone (optimizer loop)
 - [ ] GEMM > cuBLAS on at least one problem size (AI-guided + fusion)
 - [ ] Attention ≥ 90% FlashAttention v2 efficiency milestone
 - [ ] Extend optimizer + generator to all kernels (Attention, Conv2D, and generated kernels)

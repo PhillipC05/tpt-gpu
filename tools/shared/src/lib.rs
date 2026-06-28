@@ -1,20 +1,3 @@
-<<<<<<< Updated upstream
-mod provider;
-pub use provider::{AiProvider, AiError, ClaudeProvider, OpenRouterProvider, OllamaProvider};
-
-/// Select a provider from environment variables.
-///
-/// Priority: ANTHROPIC_API_KEY → OPENROUTER_API_KEY → Ollama (local, no key needed).
-pub fn provider_from_env() -> Box<dyn AiProvider> {
-    if let Ok(key) = std::env::var("ANTHROPIC_API_KEY") {
-        Box::new(ClaudeProvider::new(key))
-    } else if let Ok(key) = std::env::var("OPENROUTER_API_KEY") {
-        Box::new(OpenRouterProvider::new(key))
-    } else {
-        Box::new(OllamaProvider::default())
-    }
-}
-=======
 //! # TPT AI — Multi-provider AI abstraction
 //!
 //! Unified `AiProvider` trait for LLM inference across multiple backends:
@@ -25,6 +8,13 @@ pub fn provider_from_env() -> Box<dyn AiProvider> {
 //! Each provider implements the same trait, allowing kernel-generation prompts,
 //! optimization hints, and natural-language queries to route through whichever
 //! backend is configured.
+//!
+//! ## Backward-compatible `generate()` convenience method
+//!
+//! The [`AiProvider::generate`] method provides a simple `generate(&str) -> Result<String, AiError>`
+//! convenience that wraps the structured [`AiProvider::complete`] API.  This is used by
+//! `tools/kernel-optimizer` and `tools/kernel-generator` for simple prompt-to-response
+//! flows without needing to construct full [`AiRequest`] objects.
 
 pub mod error;
 pub mod providers;
@@ -34,7 +24,10 @@ pub mod response;
 pub use error::{AiError, AiResult};
 pub use request::{AiRequest, AiMessage, Role, ModelConfig};
 pub use response::{AiResponse, AiChoice, Usage, FinishReason};
-pub use providers::{AiProvider, claude::ClaudeProvider, openrouter::OpenRouterProvider, ollama::OllamaProvider, ProviderFactory, available_providers, is_valid_provider};
+pub use providers::{
+    AiProvider, claude::ClaudeProvider, openrouter::OpenRouterProvider,
+    ollama::OllamaProvider, ProviderFactory, available_providers, is_valid_provider,
+};
 
 /// Re-export commonly used types
 pub mod prelude {
@@ -44,4 +37,23 @@ pub mod prelude {
 
 /// Crate version
 pub const VERSION: &str = env!("CARGO_PKG_VERSION");
->>>>>>> Stashed changes
+
+// ---------------------------------------------------------------------------
+// Provider discovery
+// ---------------------------------------------------------------------------
+
+/// Select a provider from environment variables.
+///
+/// Priority: ANTHROPIC_API_KEY → OPENROUTER_API_KEY → Ollama (local, no key needed).
+///
+/// Returns a boxed trait object that supports both the structured [`AiProvider::complete`]
+/// API and the simple [`AiProvider::generate`] convenience method.
+pub fn provider_from_env() -> Box<dyn AiProvider> {
+    if let Ok(provider) = ClaudeProvider::from_env() {
+        Box::new(provider)
+    } else if let Ok(provider) = OpenRouterProvider::from_env() {
+        Box::new(provider)
+    } else {
+        Box::new(OllamaProvider::new())
+    }
+}
