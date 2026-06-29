@@ -3,6 +3,7 @@ mod config;
 mod correctness;
 mod detect;
 mod report;
+mod scoreboard;
 
 use anyhow::{bail, Context, Result};
 use clap::Parser;
@@ -40,6 +41,16 @@ struct Cli {
     /// Path to repo root (for tuning/ directory lookup). Defaults to cwd.
     #[arg(long)]
     repo_root: Option<PathBuf>,
+
+    /// Instead of running benchmarks, aggregate all results/<gpu>-<ts>.json
+    /// files and update the Community Scoreboard section in BENCHMARKS.md.
+    #[arg(long)]
+    scoreboard: bool,
+
+    /// Path to BENCHMARKS.md to update when --scoreboard is set.
+    /// Defaults to BENCHMARKS.md in the repo root.
+    #[arg(long)]
+    benchmarks_md: Option<PathBuf>,
 }
 
 fn main() -> Result<()> {
@@ -49,6 +60,11 @@ fn main() -> Result<()> {
         .repo_root
         .clone()
         .unwrap_or_else(|| std::env::current_dir().unwrap());
+
+    // Scoreboard mode: aggregate results/ → update BENCHMARKS.md, then exit.
+    if cli.scoreboard {
+        return cmd_scoreboard(&cli, &repo_root);
+    }
 
     let cfg = config::load(&cli.config)?;
 
@@ -177,6 +193,49 @@ fn main() -> Result<()> {
              CI will validate the JSON schema automatically.",
             profile_path.display()
         );
+    }
+
+    Ok(())
+}
+
+// ---------------------------------------------------------------------------
+// Scoreboard subcommand
+// ---------------------------------------------------------------------------
+
+fn cmd_scoreboard(cli: &Cli, repo_root: &Path) -> Result<()> {
+    let results_dir = if cli.output.is_absolute() {
+        cli.output.clone()
+    } else {
+        repo_root.join(&cli.output)
+    };
+
+    let benchmarks_path = cli
+        .benchmarks_md
+        .clone()
+        .unwrap_or_else(|| repo_root.join("BENCHMARKS.md"));
+
+    println!("TPT-GenBench scoreboard updater");
+    println!("  Results dir : {}", results_dir.display());
+    println!("  BENCHMARKS  : {}", benchmarks_path.display());
+
+    if !results_dir.exists() {
+        println!("  No results directory found — writing empty scoreboard.");
+        let changed = scoreboard::update_benchmarks_md(&benchmarks_path, &[])?;
+        println!("{}", if changed { "  BENCHMARKS.md updated." } else { "  BENCHMARKS.md unchanged." });
+        return Ok(());
+    }
+
+    let reports = scoreboard::load_results(&results_dir)?;
+    println!("  Loaded {} result file(s)", reports.len());
+
+    let scorecards = scoreboard::build_scorecards(&reports);
+    println!("  {} unique GPU(s) in scoreboard", scorecards.len());
+
+    let changed = scoreboard::update_benchmarks_md(&benchmarks_path, &scorecards)?;
+    if changed {
+        println!("  BENCHMARKS.md updated.");
+    } else {
+        println!("  BENCHMARKS.md already up to date.");
     }
 
     Ok(())

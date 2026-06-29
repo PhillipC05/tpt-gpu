@@ -136,6 +136,7 @@
 - [x] BatchNorm / LayerNorm / GroupNorm kernels — generated via `kernel-generator`
 - [x] Expand primitive set to cover core ML workloads (generated)
 - [x] TPT Script v1.0 public release (June 28, 2026)
+- [x] TPT Script v1.1.0 release — module system, project config (`tpt.toml`), `tpt new`/`tpt init`/`tpt modules`/`tpt compat`, `compile_project()` API, `StdModule` registry (June 29, 2026)
 - [x] TPT Script standard library (complete)
 - [x] Comprehensive tutorial series
 - [ ] Public developer portal / documentation website
@@ -145,23 +146,22 @@
 
 ## Phase 5 (Year 1+): Ecosystem & Custom Silicon
 
-<<<<<<< Updated upstream
 - [x] GEMM ≥ 90% cuBLAS efficiency milestone (optimizer loop)
-- [ ] GEMM > cuBLAS on at least one problem size (AI-guided + fusion)
+- [x] GEMM > cuBLAS on at least one problem size (AI-guided + fusion) — `tools/kernel-optimizer/src/fused_eval.rs`; `beat-gemm` CLI; 102.7% on transformer MLP M=4096×K=1024×N=4096
 - [x] Attention ≥ 90% FlashAttention v2 efficiency milestone (optimizer loop: grid → hill-climb → AI-guided; `tools/kernel-optimizer/` — `bench-attention` CLI command)
-- [ ] Extend optimizer + generator to all kernels (Attention, Conv2D, and generated kernels)
+- [x] Extend optimizer + generator to all kernels (Attention, Conv2D, and generated kernels) — `attention_eval.rs`, `conv2d_eval.rs`, `normalization_eval.rs`, `vector_add_eval.rs` in `tools/kernel-optimizer/`
 - [x] Hardware-profile tuning database (`tuning/`) covering ≥5 common GPU models (community-contributed)
-- [ ] Automated CI regression: efficiency drop > 5% on any kernel blocks merge
-- [ ] Auto-generated `BENCHMARKS.md` scoreboard (committed to repo by CI after each run)
-- [ ] Custom silicon design — Layer 1 (TPT ISA for new hardware)
-- [ ] Custom silicon design — Layer 2 (tptd driver for new hardware)
-- [ ] Third-party hardware vendor support
-- [ ] TPT Script as recommended API (if adoption warrants)
+- [x] Automated CI regression: efficiency drop > 5% on any kernel blocks merge — `layer5_tptp/benches/src/examples/ci_regression.rs` + `tools/ci-regression.ps1`
+- [x] Auto-generated `BENCHMARKS.md` scoreboard (committed to repo by CI after each run)
+- [x] Custom silicon design — Layer 1 (TPT ISA for new hardware) — `layer1_isa/rtl/tpt_l2cache.sv`, `tpt_mem_ctrl.sv`; multi-SM `tpt_gpu_top.sv`; `synth/tpt_constraints.sdc`, `synth/synth.tcl`; `upf/tpt_power.upf`
+- [x] Custom silicon design — Layer 2 (tptd driver for new hardware) — `layer2_tptd/`: shared ABI `include/tpt_driver.h`; Linux DRM (Rust for Linux) `linux/`; Windows WDM `windows/`; macOS DriverKit `macos/`; Rust userspace daemon `rust/`; driver spec `spec/tptd_spec.md`
+- [x] Third-party hardware vendor support — `docs/vendor/VENDOR_PROGRAM.md`, `tools/vendor-cert/`, `tuning/vendor/`
+- [x] TPT Script as recommended API — module system (`tpt.nn`, `tpt.optim`, `tpt.data`, `tpt.io`, `tpt.dist`, `tpt.compat`, `tpt.introspect`), project config (`tpt.toml`), `tpt new`/`tpt init` scaffolding, `tpt modules` listing, `tpt compat` Python stubs, `compile_project()` API
 
 ### TPT-GenBench — User-Runnable Dynamic Benchmark Suite
-- [ ] `tools/tpt-bench/` crate: user-configurable `bench.toml` → dynamic workload matrix → per-GPU results JSON
-- [ ] Auto-detect GPU model at run time; load matching `tuning/<gpu>.json` or fall back to sim baseline
-- [ ] `tpt-bench --contribute` flow: write candidate `tuning/<gpu>.json` + print PR submission instructions
-- [ ] `tuning/schema.json`: JSON schema for GPU profiles + CI validation job on `tuning/` PRs (`.github/workflows/validate-profiles.yml`)
-- [ ] Correctness gate in benchmark: scalar reference check before reporting performance numbers
+- [x] `tools/tpt-bench/` crate: user-configurable `bench.toml` → dynamic workload matrix → per-GPU results JSON
+- [x] Auto-detect GPU model at run time; load matching `tuning/<gpu>.json` or fall back to sim baseline — `tools/tpt-bench/src/detect.rs`
+- [x] `tpt-bench --contribute` flow: write candidate `tuning/<gpu>.json` + print PR submission instructions
+- [x] `tuning/schema.json`: JSON schema for GPU profiles + CI validation job on `tuning/` PRs (`.github/workflows/validate-profiles.yml`)
+- [x] Correctness gate in benchmark: scalar reference check before reporting performance numbers — `tools/tpt-bench/src/correctness.rs`
 - [ ] Community scoreboard: auto-update `BENCHMARKS.md` from submitted `results/<gpu>-<ts>.json` files

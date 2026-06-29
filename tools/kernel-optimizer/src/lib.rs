@@ -7,8 +7,9 @@
 
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
 // ---------------------------------------------------------------------------
-// Real-hardware GEMM evaluator (cuBLAS efficiency milestone)
+// Kernel evaluator modules
 // ---------------------------------------------------------------------------
 
 pub mod real_evaluator;
@@ -17,17 +18,19 @@ pub use real_evaluator::{
     standard_gemm_problems, optimize_gemm_problem, optimize_all_gemm_problems,
     generate_milestone_report, generate_milestone_json,
 };
-pub use real_evaluator::{
-    RealAttentionEvaluator, AttentionProblemConfig, AttentionOptResult,
-    standard_attention_problems, optimize_attention_problem, optimize_all_attention_problems,
-    generate_attention_milestone_report, generate_attention_milestone_json,
-};
 
 pub mod attention_eval;
 pub use attention_eval::{
     RealAttentionEvaluator, AttentionProblemConfig, AttentionOptResult,
     standard_attention_problems, optimize_attention_problem, optimize_all_attention_problems,
     generate_attention_milestone_report, generate_attention_milestone_json,
+};
+
+pub mod fused_eval;
+pub use fused_eval::{
+    FusedGemmEvaluator, FusedGemmProblem, FusedGemmOptResult,
+    fused_gemm_problems, optimize_fused_problem, run_beat_cublas_campaign,
+    generate_beat_cublas_report, generate_beat_cublas_json,
 };
 
 pub mod conv2d_eval;
@@ -155,7 +158,6 @@ impl ParamSpace {
         ])
     }
 
-    /// Number of configurations (Cartesian product size).
     /// Number of configurations (Cartesian product size).
     pub fn total_configs(&self) -> usize {
         self.dims.iter().map(|d| d.values.len()).product()

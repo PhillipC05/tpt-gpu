@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.1.0] - 2026-06-29
+
+### Added
+
+#### TPT Script as Recommended API
+- **Module system** - Full support for all 8 standard library namespaces: `tpt`, `tpt.introspect`, `tpt.nn`, `tpt.optim`, `tpt.data`, `tpt.io`, `tpt.dist`, `tpt.compat`
+- **Project configuration** - `tpt.toml` project files with `[package]`, `[features]`, `[profile]`, `[dependencies]` sections
+- **Project scaffolding** - `tpt new <name>` creates a new project with `tpt.toml`, `src/main.tpts`, `.gitignore`
+- **`tpt init`** - Initialize a project in the current directory
+- **`tpt modules`** - List all standard library modules with their operations
+- **`tpt compat`** - Generate Python type stubs (`.pyi`) from TPT Script source for IDE integration
+- **`tpt check`** now validates imports against the standard library
+- **`tpt compile`** now auto-detects `tpt.toml` and applies feature flags
+- **`compile_project()` API** - New recommended entry point combining compilation with module resolution
+- **Import validation** - Unknown `tpt.*` modules produce clear error messages
+- **Feature-gated imports** - `tpt.nn` with `gpu = true` auto-imports GPU-accelerated layers
+- **`ProjectConfig`** - Serde-compatible configuration struct with `from_toml()` / `to_toml()` support
+- **`StdModule` registry** - Query available modules and their operations programmatically
+
+---
+
+# 
+All notable changes to TPT GPU will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+---
+
 ## [1.0.0] - 2026-06-28
 
 ### Added

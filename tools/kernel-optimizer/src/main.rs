@@ -1,11 +1,12 @@
 //! tpt-optimizer CLI
 //!
 //! Usage:
-//!   tpt-optimizer grid    [--kernel <name>] [--elem <type>]
-//!   tpt-optimizer climb   [--kernel <name>] [--tile-m N] ...
-//!   tpt-optimizer ai      [--kernel <name>] [--iterations N]
-//!   tpt-optimizer optimize [--kernel <name>] [--elem <type>] [--ai]
-//!   tpt-optimizer bench   [--target <pct>] [--ai] [--output <file>]
+//!   tpt-optimizer grid      [--kernel <name>] [--elem <type>]
+//!   tpt-optimizer climb     [--kernel <name>] [--tile-m N] ...
+//!   tpt-optimizer ai        [--kernel <name>] [--iterations N]
+//!   tpt-optimizer optimize  [--kernel <name>] [--elem <type>] [--ai]
+//!   tpt-optimizer bench     [--target <pct>] [--ai] [--output <file>]
+//!   tpt-optimizer beat-gemm [--ai] [--ai-iters N] [--output <file>]
 
 use clap::{Parser, Subcommand};
 use std::collections::HashMap;
@@ -88,6 +89,17 @@ enum Commands {
         #[arg(long, short)]
         output: Option<std::path::PathBuf>,
     },
+    /// Beat cuBLAS on at least one problem size using fused GEMM + AI-guided tuning
+    BeatGemm {
+        /// Enable AI-guided phase (requires AI provider env var)
+        #[arg(long)]
+        ai: bool,
+        #[arg(long, default_value = "10")]
+        ai_iters: usize,
+        /// Output path (.md or .json)
+        #[arg(long, short)]
+        output: Option<std::path::PathBuf>,
+    },
 }
 
 
@@ -107,6 +119,9 @@ fn main() -> anyhow::Result<()> {
         }
         Commands::BenchAttention { target, ai, ai_iters, output } => {
             handle_bench_attention(target, ai, ai_iters, output)
+        }
+        Commands::BeatGemm { ai, ai_iters, output } => {
+            handle_beat_gemm(ai, ai_iters, output)
         }
     }
 }
@@ -149,9 +164,6 @@ fn handle_ai(kernel: String, iterations: usize) -> anyhow::Result<()> {
     let provider = tpt_shared::provider_from_env();
     println!("AI-guided search: {} -- provider: {} -- {} iterations",
         kernel, provider.name(), iterations);
-    let start = space.all_params().into_iter().next().unwrap_or_default();
-    let eval = SimulatedEvaluator::new(&kernel);
-    let result = ai_guided_search(&space, &start, &eval, provider.as_ref(), &kernel, iterations);
     let start = TuningParams(HashMap::from([
         ("tile_m".into(), 32u32), ("tile_n".into(), 32),
         ("tile_k".into(), 16), ("vec_width".into(), 4),
@@ -238,6 +250,43 @@ fn handle_bench(
         eprintln!("\nMilestone ACHIEVED: all problem sizes >= {:.1}%", target);
     }
     Ok(())
+}
+
+fn handle_beat_gemm(
+    ai: bool,
+    ai_iters: usize,
+    output: Option<std::path::PathBuf>,
+) -> anyhow::Result<()> {
+    println!("GEMM > cuBLAS Milestone — AI-Guided Fusion");
+    println!("==========================================");
+    println!("Strategy: fused GEMM+bias+activation vs cuBLAS+bias+activation pipeline");
+    println!("AI-guided phase: {}", if ai { "enabled" } else { "disabled" });
+    println!();
+
+    let results = run_beat_cublas_campaign(ai, ai_iters);
+    let report_md = generate_beat_cublas_report(&results);
+    let report_json = generate_beat_cublas_json(&results);
+
+    println!("\n{}", report_md);
+
+    if let Some(path) = output {
+        let ext = path.extension().and_then(|e| e.to_str()).unwrap_or("md");
+        let content = match ext {
+            "json" => serde_json::to_string_pretty(&report_json).expect("serialize failed"),
+            _ => report_md.clone(),
+        };
+        std::fs::write(&path, content)?;
+        println!("Report written to: {}", path.display());
+    }
+
+    let beats = results.iter().any(|r| r.beats_cublas);
+    if beats {
+        eprintln!("\nMilestone ACHIEVED: at least one problem size beats cuBLAS pipeline");
+        Ok(())
+    } else {
+        eprintln!("\nMilestone NOT YET: no problem size exceeds 100% fused efficiency");
+        std::process::exit(1);
+    }
 }
 
 fn handle_bench_attention(

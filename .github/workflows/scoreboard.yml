@@ -1,0 +1,58 @@
+name: Update Community Scoreboard
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'results/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  scoreboard:
+    name: Regenerate BENCHMARKS.md scoreboard
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need push access — use the default GITHUB_TOKEN
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Cargo registry
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-tpt-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-tpt-bench-
+
+      - name: Build tpt-bench
+        run: cargo build -p tpt-bench --release
+
+      - name: Update scoreboard
+        run: |
+          cargo run -p tpt-bench --release -- \
+            --scoreboard \
+            --output results \
+            --benchmarks-md BENCHMARKS.md \
+            --repo-root .
+
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet BENCHMARKS.md; then
+            echo "BENCHMARKS.md unchanged — nothing to commit."
+          else
+            git add BENCHMARKS.md
+            git commit -m "chore: update community GPU scoreboard [skip ci]"
+            git push
+          fi
