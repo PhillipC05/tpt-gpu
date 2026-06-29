@@ -138,8 +138,34 @@ The TPTIR text format uses `^label:` blocks. TPTIR emitted by layer7 feeds direc
 - **`command/queue.rs`** — Priority queue scheduler with aging to prevent starvation
 - **`kernel/launch.rs`** — `KernelConfig`, `ArgumentBuffer`, `KernelHandle`
 - **`error.rs`** — `TptrError` with structured error codes for Python surface
+- **`arch.rs`** — Architecture template dispatch: maps GGUF `general.architecture` → `ArchTemplate` (sequence of `ForwardOp`s); add new model support by adding one function + one match arm
+- **`inference.rs`** — `LlmInference` trait + `GpuInferenceEngine` implementation; routes forward-pass ops through layer5 kernel handles with `VendorBackend::detect()` (CUDA → ROCm → Metal → TPTIR)
+- **`kv_cache.rs`** — `KvCache`: sliding-window host-side K/V cache per transformer layer; drops oldest token on overflow for indefinite-length decoding
 
 Python bindings (`tptr-py`) wrap these via PyO3: `Device`, `Memory`, `Queue`, `Kernel`.
+
+---
+
+## Tools
+
+| Tool | Location | Description |
+|------|----------|-------------|
+| `tpt-bench` | `tools/tpt-bench/` | Benchmark harness for primitives and kernels |
+| `kernel-generator` | `tools/kernel-generator/` | AI-assisted kernel generation (spec → TPTIR → validate → bench) |
+| `kernel-optimizer` | `tools/kernel-optimizer/` | Auto-tuning: grid search → hill-climb → AI-guided |
+| `model-registry` | `tools/model-registry/` | Shared GGUF model registry (`~/.tpt/models/`); `ModelRegistry::open()`, HuggingFace download via `hf.rs` |
+| `tpt-playground` | `tools/tpt-playground/` | Interactive TPT Script playground |
+| `vendor-cert` | `tools/vendor-cert/` | Vendor certification harness |
+
+The `model-registry` crate is shared across tpt-gpu, tpt-spark, and tpt-crucible. Models are downloaded once to `~/.tpt/models/` and never duplicated. See `MODELS_REGISTRY.md` for the manifest format.
+
+---
+
+## Crates
+
+| Crate | Location | Description |
+|-------|----------|-------------|
+| `tptir-spec` | `crates/tptir-spec/` | Machine-readable TPTIR operation specifications |
 
 ---
 

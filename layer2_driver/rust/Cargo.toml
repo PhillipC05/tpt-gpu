@@ -5,7 +5,7 @@ edition     = "2021"
 authors     = ["TPT GPU Contributors"]
 description = "TPT GPU userspace driver library"
 license     = "Apache-2.0"
-repository  = "https://github.com/tpt-gpu/tpt-gpu"
+repository  = "https://github.com/PhillipC05/tpt-gpu"
 
 [lib]
 name    = "tptd"

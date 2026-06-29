@@ -156,4 +156,4 @@ We welcome your feedback! Please open issues on GitHub or join the discussion.
 
 ---
 
-*For older releases, see the [GitHub Releases](https://github.com/tpt-gpu/tpt-gpu/releases) page.*
+*For older releases, see the [GitHub Releases](https://github.com/PhillipC05/tpt-gpu/releases) page.*

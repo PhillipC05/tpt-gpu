@@ -109,10 +109,10 @@ This document tracks the completion of all tasks for the TPT Script v1.0.0 publi
 
 ## 🔗 Useful Links
 
-- **Repository:** https://github.com/tpt-gpu/tpt-gpu
+- **Repository:** https://github.com/PhillipC05/tpt-gpu
 - **Documentation:** https://docs.rs/tptb-core
-- **Issues:** https://github.com/tpt-gpu/tpt-gpu/issues
-- **Discussions:** https://github.com/tpt-gpu/tpt-gpu/discussions
+- **Issues:** https://github.com/PhillipC05/tpt-gpu/issues
+- **Discussions:** https://github.com/PhillipC05/tpt-gpu/discussions
 - **Crates.io:** https://crates.io/crates/tptb-core
 
 ---

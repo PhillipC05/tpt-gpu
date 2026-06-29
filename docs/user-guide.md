@@ -33,7 +33,7 @@ TPT Script is part of the TPT GPU platform. To get started:
 
 ```bash
 # Clone the repository
-git clone https://github.com/tpt-gpu/tpt-gpu.git
+git clone https://github.com/PhillipC05/tpt-gpu.git
 cd tpt-gpu
 
 # Build the compiler (requires Rust)

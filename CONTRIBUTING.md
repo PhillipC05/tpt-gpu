@@ -40,7 +40,7 @@ This project adheres to a code of conduct. By participating, you are expected to
    ```
 3. Add the upstream remote:
    ```bash
-   git remote add upstream https://github.com/tpt-gpu/tpt-gpu.git
+   git remote add upstream https://github.com/PhillipC05/tpt-gpu.git
    ```
 
 ### Branch Naming
@@ -258,8 +258,8 @@ mod tests {
 If you have questions:
 
 1. Check the [documentation](docs/user-guide.md)
-2. Search [existing issues](https://github.com/tpt-gpu/tpt-gpu/issues)
-3. Ask in [GitHub Discussions](https://github.com/tpt-gpu/tpt-gpu/discussions)
+2. Search [existing issues](https://github.com/PhillipC05/tpt-gpu/issues)
+3. Ask in [GitHub Discussions](https://github.com/PhillipC05/tpt-gpu/discussions)
 
 ---
 

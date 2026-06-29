@@ -19,7 +19,7 @@ edition = "2021"
 license = "Apache-2.0 WITH LLVM-exception"
 description = "TPT GPU kernel generator and compiler infrastructure"
 authors = ["TPT GPU Contributors"]
-repository = "https://github.com/tpt-gpu/tpt-gpu"
+repository = "https://github.com/PhillipC05/tpt-gpu"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
