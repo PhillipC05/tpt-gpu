@@ -1,0 +1,16 @@
+[package]
+name = "tptir-spec"
+version = "0.1.0"
+edition = "2021"
+description = "TPTIR dialect specification — ops, types, attributes, and stable text-format serialization"
+license = "Apache-2.0"
+repository = "https://github.com/tpt-gpu/tpt-gpu"
+keywords = ["gpu", "compiler", "ir", "mlir"]
+categories = ["compilers"]
+
+[features]
+default = []
+serde = ["dep:serde"]
+
+[dependencies]
+serde = { version = "1", features = ["derive"], optional = true }

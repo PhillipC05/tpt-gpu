@@ -1208,6 +1208,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tpt-model-registry"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "tpt-optimizer"
 version = "1.0.0"
 dependencies = [
@@ -1249,6 +1259,13 @@ dependencies = [
  "numpy",
  "pyo3",
  "tptr-core",
+]
+
+[[package]]
+name = "tptir-spec"
+version = "0.1.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

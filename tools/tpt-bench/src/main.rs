@@ -8,7 +8,7 @@ mod scoreboard;
 use anyhow::{bail, Context, Result};
 use clap::Parser;
 use std::collections::HashMap;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 use std::time::Instant;
 
 #[derive(Parser)]

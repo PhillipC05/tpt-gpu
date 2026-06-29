@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crates/tptir-spec",
     "layer3_tptc/rust",
     "tools/kernel-generator",
     "tools/shared",
@@ -8,6 +9,7 @@ members = [
     "layer5_tptp/tptp-core",
     "layer5_tptp/benches",
     "tools/tpt-bench",
+    "tools/model-registry",
 ]
 resolver = "2"
 

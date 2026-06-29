@@ -8,6 +8,9 @@ pub mod memory;
 pub mod command;
 pub mod kernel;
 pub mod device;
+pub mod arch;
+pub mod kv_cache;
+pub mod inference;
 
 /// Re-export the error types at the crate root.
 pub use error::{TptrError, TptrResult, ErrorCode, ErrorContext};
@@ -23,3 +26,12 @@ pub use command::{CommandQueue, CommandScheduler, Command, QueuePriority, QueueH
 
 /// Re-export kernel types at the crate root.
 pub use kernel::{Kernel, KernelConfig, KernelHandle, Dim3, KernelLaunchMode};
+
+/// Re-export inference types at the crate root.
+pub use inference::{LlmInference, GpuInferenceEngine, ModelInfo, parse_gguf_header};
+
+/// Re-export arch-template types at the crate root.
+pub use arch::{ArchTemplate, ForwardOp, template_for_arch};
+
+/// Re-export KV cache at the crate root.
+pub use kv_cache::KvCache;

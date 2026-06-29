@@ -1,0 +1,16 @@
+[package]
+name = "tpt-model-registry"
+version = "0.1.0"
+edition = "2021"
+description = "Shared ~/.tpt/models/ registry for all TPT compute tools"
+license = "Apache-2.0"
+
+[[bin]]
+name = "tpt-models"
+path = "src/main.rs"
+
+[dependencies]
+serde      = { workspace = true }
+serde_json = { workspace = true }
+anyhow     = { workspace = true }
+clap       = { workspace = true }

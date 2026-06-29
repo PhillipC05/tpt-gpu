@@ -164,4 +164,4 @@
 - [x] `tpt-bench --contribute` flow: write candidate `tuning/<gpu>.json` + print PR submission instructions
 - [x] `tuning/schema.json`: JSON schema for GPU profiles + CI validation job on `tuning/` PRs (`.github/workflows/validate-profiles.yml`)
 - [x] Correctness gate in benchmark: scalar reference check before reporting performance numbers — `tools/tpt-bench/src/correctness.rs`
-- [ ] Community scoreboard: auto-update `BENCHMARKS.md` from submitted `results/<gpu>-<ts>.json` files
+- [x] Community scoreboard: auto-update `BENCHMARKS.md` from submitted `results/<gpu>-<ts>.json` files — `tools/tpt-bench/src/scoreboard.rs`; `tpt-bench --scoreboard`; `.github/workflows/scoreboard.yml`

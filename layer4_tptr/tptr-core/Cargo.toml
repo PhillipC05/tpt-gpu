@@ -10,3 +10,4 @@ thiserror = "2"
 parking_lot = "0.12"
 log = "0.4"
 bytemuck = "1.21"
+tptp-core = { path = "../../layer5_tptp/tptp-core" }

@@ -25,6 +25,7 @@ pub struct KindStats {
     pub avg_gflops: f64,
     pub peak_gflops: f64,
     pub avg_efficiency_pct: Option<f64>,
+    #[allow(dead_code)]
     pub case_count: usize,
 }
 

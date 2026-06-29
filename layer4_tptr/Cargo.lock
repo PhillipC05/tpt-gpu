@@ -252,6 +252,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "tptp-core"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "libc",
+ "log",
+ "parking_lot",
+ "thiserror",
+]
+
+[[package]]
 name = "tptr-core"
 version = "0.1.0"
 dependencies = [
@@ -259,6 +270,7 @@ dependencies = [
  "log",
  "parking_lot",
  "thiserror",
+ "tptp-core",
 ]
 
 [[package]]
