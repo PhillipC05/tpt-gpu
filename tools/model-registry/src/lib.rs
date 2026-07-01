@@ -27,12 +27,22 @@ pub struct ModelEntry {
     pub arch: String,
     /// Approximate on-disk size in GiB.
     pub size_gb: f64,
-    /// SHA-256 of the GGUF file (optional — used for integrity verification).
+    /// SHA-256 of the GGUF or TPTF file (optional — integrity verification).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub sha256: Option<String>,
     /// Original download URL (optional — informational).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub source: Option<String>,
+    /// Per-layer bit depths produced by `model-optimizer` (2/4/6/8/16).
+    /// `None` means the model is unoptimized (full f32/f16 weights).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quant_bits: Option<Vec<u8>>,
+    /// Domains removed during surgical pruning (e.g. `["sql", "typescript"]`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pruned_domains: Option<Vec<String>>,
+    /// Registry name of the unoptimized source model this was derived from.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_model: Option<String>,
 }
 
 /// The `models.json` manifest.
@@ -175,6 +185,9 @@ mod tests {
             size_gb: 4.7,
             sha256:  None,
             source:  Some("https://huggingface.co/example".to_string()),
+            quant_bits: None,
+            pruned_domains: None,
+            source_model: None,
         };
         reg.register(entry.clone()).unwrap();
 
@@ -195,6 +208,7 @@ mod tests {
         reg.register(ModelEntry {
             name: "test-model".to_string(), file: "test.gguf".to_string(),
             arch: "llama3".to_string(), size_gb: 1.0, sha256: None, source: None,
+            quant_bits: None, pruned_domains: None, source_model: None,
         }).unwrap();
 
         let removed = reg.unregister("test-model").unwrap();
@@ -215,10 +229,12 @@ mod tests {
         reg.register(ModelEntry {
             name: "m".to_string(), file: "m.gguf".to_string(),
             arch: "phi3".to_string(), size_gb: 2.0, sha256: None, source: None,
+            quant_bits: None, pruned_domains: None, source_model: None,
         }).unwrap();
         reg.register(ModelEntry {
             name: "m".to_string(), file: "m.gguf".to_string(),
             arch: "phi3".to_string(), size_gb: 2.5, sha256: None, source: None,
+            quant_bits: Some(vec![4, 4, 6, 8]), pruned_domains: Some(vec!["sql".to_string()]), source_model: Some("m-orig".to_string()),
         }).unwrap();
 
         assert_eq!(reg.models().len(), 1);

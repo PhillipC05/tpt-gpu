@@ -30,7 +30,7 @@ use crate::kv_cache::KvCache;
 // ModelInfo
 // ---------------------------------------------------------------------------
 
-/// Metadata extracted from the GGUF file header.
+/// Metadata extracted from the GGUF or TPTF file header.
 #[derive(Debug, Clone)]
 pub struct ModelInfo {
     pub path:         PathBuf,
@@ -50,6 +50,34 @@ pub struct ModelInfo {
     pub ffn_dim:      u32,
     /// Number of transformer layers (blocks).
     pub num_layers:   u32,
+    /// Per-layer quantization bit depths from model-optimizer (2/4/6/8/16).
+    /// Empty means all layers use f32. Indexed `[layer_idx]`.
+    pub per_layer_bits: Vec<u8>,
+    /// Neuron indices zeroed by the surgical pruner, one `Vec<u32>` per layer.
+    /// `None` means no pruning was applied.
+    pub pruning_mask: Option<Vec<Vec<u32>>>,
+}
+
+/// The on-disk format of a model file.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum ModelFormat {
+    Gguf,
+    Tptf,
+    Unknown,
+}
+
+/// Detect the on-disk format by reading the 4-byte magic.
+pub fn detect_format(path: &Path) -> ModelFormat {
+    use std::fs::File;
+    use std::io::Read;
+    let Ok(mut f) = File::open(path) else { return ModelFormat::Unknown; };
+    let mut magic = [0u8; 4];
+    if f.read_exact(&mut magic).is_err() { return ModelFormat::Unknown; }
+    match &magic {
+        b"GGUF" => ModelFormat::Gguf,
+        b"TPTF" => ModelFormat::Tptf,
+        _       => ModelFormat::Unknown,
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -291,6 +319,127 @@ pub fn parse_gguf_header(path: &Path) -> TptrResult<ModelInfo> {
         num_kv_heads,
         ffn_dim,
         num_layers,
+        per_layer_bits: Vec::new(),
+        pruning_mask: None,
+    })
+}
+
+// ---------------------------------------------------------------------------
+// TPTF header parser
+// ---------------------------------------------------------------------------
+
+/// Parse the TPTF v1 binary header and extract `ModelInfo`.
+///
+/// TPTF layout (first 512 bytes):
+/// - [0..4]   magic "TPTF"
+/// - [4..8]   version u32
+/// - [8..12]  flags u32 (bit 0 = has_pruning_mask, bit 1 = has_chat_template)
+/// - [12..76] arch string: u8 length prefix + UTF-8 bytes (max 63 chars)
+/// - [76..80] context_len u32
+/// - [80..84] vocab_size u32
+/// - [84..88] hidden_dim u32
+/// - [88..92] num_heads u32
+/// - [92..96] num_kv_heads u32
+/// - [96..100] ffn_dim u32
+/// - [100..104] num_layers u32
+/// - [104..232] per_layer_bits[u8; 128]
+pub fn parse_tptf_header(path: &Path) -> TptrResult<ModelInfo> {
+    use std::fs;
+
+    if !path.exists() {
+        return Err(TptrError::new(
+            ErrorCode::InvalidKernel,
+            format!("model file not found: {}", path.display()),
+        ));
+    }
+
+    let data = fs::read(path).map_err(|e| {
+        TptrError::new(ErrorCode::InternalError, format!("cannot read {}: {}", path.display(), e))
+    })?;
+
+    if data.len() < 512 {
+        return Err(TptrError::new(
+            ErrorCode::InvalidKernel,
+            format!("TPTF file too short ({} bytes, need ≥ 512)", data.len()),
+        ));
+    }
+
+    let mut r = BufReader::new(&data);
+
+    let magic = r.read_bytes(4).map_err(|e| {
+        TptrError::new(ErrorCode::InvalidKernel, format!("cannot read TPTF magic: {}", e))
+    })?;
+    if magic != b"TPTF" {
+        return Err(TptrError::new(
+            ErrorCode::InvalidKernel,
+            format!("not a TPTF file (magic = {:?})", magic),
+        ));
+    }
+
+    let version = r.read_u32().map_err(|e| {
+        TptrError::new(ErrorCode::InvalidKernel, format!("cannot read TPTF version: {}", e))
+    })?;
+    if version != 1 {
+        return Err(TptrError::new(
+            ErrorCode::InvalidKernel,
+            format!("unsupported TPTF version {} (supported: 1)", version),
+        ));
+    }
+
+    let flags = r.read_u32().unwrap_or(0);
+    let has_pruning_mask = (flags & 1) != 0;
+
+    // Arch string: 1-byte length prefix + bytes (packed into [12..76])
+    let arch_len = r.read_u8().unwrap_or(0) as usize;
+    let arch = if arch_len > 0 && arch_len <= 63 {
+        let bytes = r.read_bytes(arch_len).unwrap_or_default();
+        String::from_utf8_lossy(bytes).to_string()
+    } else {
+        r.read_bytes(63.min(r.remaining())).ok(); // skip padding
+        String::new()
+    };
+    // Seek to byte 76 (skip any remaining arch padding)
+    let consumed = 4 + 4 + 4 + 1 + arch_len;
+    if consumed < 76 {
+        let _ = r.read_bytes(76 - consumed);
+    }
+
+    let context_len  = r.read_u32().unwrap_or(2048);
+    let vocab_size   = r.read_u32().unwrap_or(32000);
+    let hidden_dim   = r.read_u32().unwrap_or(4096);
+    let num_heads    = r.read_u32().unwrap_or(32);
+    let num_kv_heads = r.read_u32().unwrap_or(8);
+    let ffn_dim      = r.read_u32().unwrap_or(0);
+    let num_layers   = r.read_u32().unwrap_or(32);
+
+    // Per-layer bits array [104..232]
+    let bits_bytes = r.read_bytes(128).unwrap_or_default();
+    let per_layer_bits: Vec<u8> = bits_bytes[..num_layers.min(128) as usize]
+        .iter()
+        .copied()
+        .filter(|&b| b > 0)
+        .collect();
+
+    let pruning_mask = if has_pruning_mask {
+        Some(vec![Vec::new(); num_layers as usize])
+    } else {
+        None
+    };
+
+    let ffn_dim = if ffn_dim == 0 { hidden_dim * 8 / 3 } else { ffn_dim };
+
+    Ok(ModelInfo {
+        path: path.to_owned(),
+        arch,
+        context_len,
+        vocab_size,
+        hidden_dim,
+        num_heads,
+        num_kv_heads,
+        ffn_dim,
+        num_layers,
+        per_layer_bits,
+        pruning_mask,
     })
 }
 
@@ -417,7 +566,14 @@ impl std::fmt::Debug for GpuInferenceEngine {
 
 impl LlmInference for GpuInferenceEngine {
     fn load(model_path: &Path) -> TptrResult<Self> {
-        let info     = parse_gguf_header(model_path)?;
+        let info = match detect_format(model_path) {
+            ModelFormat::Gguf    => parse_gguf_header(model_path)?,
+            ModelFormat::Tptf    => parse_tptf_header(model_path)?,
+            ModelFormat::Unknown => {
+                // Fall back to GGUF parser which will give a descriptive error.
+                parse_gguf_header(model_path)?
+            }
+        };
         let template = template_for_arch(&info.arch, &info)?;
 
         // Determine if this arch uses tied embeddings.
@@ -775,6 +931,58 @@ mod tests {
     }
 
     // ----- GGUF parser tests -----
+
+    // ----- TPTF parser tests -----
+
+    fn write_tptf(path: &Path, arch: &str, num_layers: u32, per_layer_bits: &[u8]) {
+        let mut buf = vec![0u8; 512];
+        buf[0..4].copy_from_slice(b"TPTF");
+        buf[4..8].copy_from_slice(&1u32.to_le_bytes());  // version
+        buf[8..12].copy_from_slice(&0u32.to_le_bytes()); // flags
+        let ab = arch.as_bytes();
+        buf[12] = ab.len().min(63) as u8;
+        buf[13..13 + ab.len().min(63)].copy_from_slice(&ab[..ab.len().min(63)]);
+        buf[76..80].copy_from_slice(&64u32.to_le_bytes());   // context_len
+        buf[80..84].copy_from_slice(&32000u32.to_le_bytes()); // vocab_size
+        buf[84..88].copy_from_slice(&64u32.to_le_bytes());   // hidden_dim
+        buf[88..92].copy_from_slice(&4u32.to_le_bytes());    // num_heads
+        buf[92..96].copy_from_slice(&2u32.to_le_bytes());    // num_kv_heads
+        buf[96..100].copy_from_slice(&128u32.to_le_bytes()); // ffn_dim
+        buf[100..104].copy_from_slice(&num_layers.to_le_bytes());
+        for (i, &b) in per_layer_bits.iter().enumerate().take(128) {
+            buf[104 + i] = b;
+        }
+        fs::write(path, &buf).unwrap();
+    }
+
+    #[test]
+    fn parse_tptf_header_basic() {
+        let p = tmp("basic.tptf");
+        write_tptf(&p, "llama3", 4, &[4, 4, 6, 8]);
+        let info = parse_tptf_header(&p).unwrap();
+        assert_eq!(info.arch, "llama3");
+        assert_eq!(info.num_layers, 4);
+        assert_eq!(info.per_layer_bits, vec![4, 4, 6, 8]);
+        let _ = fs::remove_file(&p);
+    }
+
+    #[test]
+    fn detect_format_tptf() {
+        let p = tmp("detect.tptf");
+        write_tptf(&p, "llama3", 2, &[]);
+        assert_eq!(detect_format(&p), ModelFormat::Tptf);
+        let _ = fs::remove_file(&p);
+    }
+
+    #[test]
+    fn load_tptf_via_engine() {
+        let p = tmp("engine.tptf");
+        write_tptf(&p, "llama3", 2, &[4, 4]);
+        let engine = GpuInferenceEngine::load(&p).unwrap();
+        assert_eq!(engine.model_info().arch, "llama3");
+        assert_eq!(engine.model_info().per_layer_bits, vec![4, 4]);
+        let _ = fs::remove_file(&p);
+    }
 
     #[test]
     fn parse_bad_magic_errors() {

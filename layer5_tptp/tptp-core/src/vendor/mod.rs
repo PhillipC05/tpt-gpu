@@ -79,6 +79,35 @@ impl VendorBackend {
     pub fn supports_conv3d(&self) -> bool {
         matches!(self, VendorBackend::Cuda(_) | VendorBackend::Rocm(_))
     }
+
+    /// Check if integer (INT8) GEMM is supported (cuBLAS cublasGemmEx / ROCm rocblas_gemm_ex).
+    pub fn supports_int8_gemm(&self) -> bool {
+        // INT8 GEMM requires Turing+ on CUDA or CDNA2+ on ROCm.
+        // Detection based on runtime capability query is deferred to the vendor
+        // backends; for now this conservatively returns false.
+        false
+    }
+
+    /// Execute quantized GEMM: C_f32 = dequant(A_packed) * B_f32.
+    ///
+    /// Only called when `supports_int8_gemm()` returns true.
+    #[allow(clippy::too_many_arguments)]
+    pub fn quant_gemm(
+        &self,
+        _a_packed:    &GpuBuffer<i8>,
+        _b_f32:       &GpuBuffer<f32>,
+        _output:      &mut GpuBuffer<f32>,
+        _scales:      &GpuBuffer<f32>,
+        _zero_points: &GpuBuffer<i8>,
+        _m: usize,
+        _n: usize,
+        _k: usize,
+        _bits: u8,
+    ) -> TptpResult<()> {
+        Err(crate::error::TptpError::unsupported(
+            "int8 GEMM vendor dispatch not yet implemented for this backend",
+        ))
+    }
 }
 
 /// Vendor library dispatch trait

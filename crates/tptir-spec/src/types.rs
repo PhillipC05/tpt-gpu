@@ -27,10 +27,15 @@ impl fmt::Display for AddressSpace {
 }
 
 /// Scalar element types supported by TPTIR.
+///
+/// Sub-byte types (`I2`, `I4`, `I6`) are used by the quantization ops
+/// (`quantize`, `dequantize`, `quant_gemm`, `quant_attention`). They are
+/// packed in memory — callers must use the quantization ops rather than raw
+/// `load`/`store` to access sub-byte tensors.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub enum ElemType {
-    I1, I8, I16, I32, I64,
+    I1, I2, I4, I6, I8, I16, I32, I64,
     F16, BF16, F32, F64,
     Index,
 }
@@ -39,6 +44,9 @@ impl ElemType {
     pub fn bit_width(self) -> u32 {
         match self {
             Self::I1            => 1,
+            Self::I2            => 2,
+            Self::I4            => 4,
+            Self::I6            => 6,
             Self::I8            => 8,
             Self::I16 | Self::F16 | Self::BF16 => 16,
             Self::I32 | Self::F32 => 32,
@@ -49,14 +57,20 @@ impl ElemType {
     pub fn is_float(self) -> bool {
         matches!(self, Self::F16 | Self::BF16 | Self::F32 | Self::F64)
     }
+
+    /// Returns true for sub-byte quantized integer types.
+    pub fn is_quantized(self) -> bool {
+        matches!(self, Self::I2 | Self::I4 | Self::I6)
+    }
 }
 
 impl fmt::Display for ElemType {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let s = match self {
-            Self::I1    => "i1",   Self::I8  => "i8",   Self::I16  => "i16",
-            Self::I32   => "i32",  Self::I64 => "i64",  Self::F16  => "f16",
-            Self::BF16  => "bf16", Self::F32 => "f32",  Self::F64  => "f64",
+            Self::I1    => "i1",   Self::I2  => "i2",   Self::I4  => "i4",
+            Self::I6    => "i6",   Self::I8  => "i8",   Self::I16 => "i16",
+            Self::I32   => "i32",  Self::I64 => "i64",  Self::F16 => "f16",
+            Self::BF16  => "bf16", Self::F32 => "f32",  Self::F64 => "f64",
             Self::Index => "index",
         };
         write!(f, "{}", s)

@@ -1,0 +1,26 @@
+[package]
+name = "tpt-model-optimizer"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Hardware-aware LLM model optimizer: quantization, surgical pruning, and TPTF export"
+
+[lib]
+name = "tpt_model_optimizer"
+path = "src/lib.rs"
+
+[[bin]]
+name = "model-optimizer"
+path = "src/main.rs"
+
+[dependencies]
+tpt-model-registry = { path = "../model-registry" }
+tpt-shared         = { path = "../shared" }
+serde      = { workspace = true }
+serde_json = { workspace = true }
+clap       = { workspace = true }
+anyhow     = { workspace = true }
+chrono     = { workspace = true }
+memmap2    = { workspace = true }
+bytemuck  = "1.21"
+byteorder  = "1.5"

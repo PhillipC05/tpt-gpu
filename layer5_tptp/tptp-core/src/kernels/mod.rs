@@ -17,6 +17,7 @@ pub mod softmax;
 pub mod elementwise;
 pub mod embedding;
 pub mod pooling;
+pub mod quant_gemm;
 
 pub use gemm::GemmKernel;
 pub use fused_gemm::{FusedGemmKernel, FusedActivation, FusedGemmParams};
@@ -31,3 +32,4 @@ pub use softmax::SoftmaxKernel;
 pub use elementwise::{ElementwiseKernel, ActivationKind};
 pub use embedding::EmbeddingKernel;
 pub use pooling::{MaxPool2DKernel, AvgPool2DKernel};
+pub use quant_gemm::{QuantGemmKernel, QuantGemmParams, DEFAULT_GROUP_SIZE};

@@ -44,6 +44,8 @@ pub enum Op {
     Gemm, Matmul, Transpose,
     // Reduction
     ReduceSum, ReduceMax, ReduceMin,
+    // Quantization (mixed-precision model optimization)
+    Quantize, Dequantize, QuantGemm, QuantAttention,
     // Escape hatch for custom / future ops
     Custom(String),
 }
@@ -71,6 +73,8 @@ impl fmt::Display for Op {
             Op::Transpose => "transpose",
             Op::ReduceSum => "reduce_sum", Op::ReduceMax => "reduce_max",
             Op::ReduceMin => "reduce_min",
+            Op::Quantize      => "quantize",       Op::Dequantize   => "dequantize",
+            Op::QuantGemm     => "quant_gemm",     Op::QuantAttention => "quant_attention",
             Op::Custom(name) => return write!(f, "{}", name),
         };
         write!(f, "{}", s)
@@ -92,6 +96,8 @@ impl Op {
             | Op::IntToFloat | Op::FloatToInt => OpCategory::Conversion,
             Op::Gemm | Op::Matmul | Op::Transpose => OpCategory::Matrix,
             Op::ReduceSum | Op::ReduceMax | Op::ReduceMin => OpCategory::Reduction,
+            Op::Quantize | Op::Dequantize
+            | Op::QuantGemm | Op::QuantAttention => OpCategory::Matrix,
             Op::Custom(_) => OpCategory::Custom,
         }
     }
@@ -117,6 +123,10 @@ impl Op {
             "gemm"  => Op::Gemm, "matmul" => Op::Matmul, "transpose" => Op::Transpose,
             "reduce_sum" => Op::ReduceSum, "reduce_max" => Op::ReduceMax,
             "reduce_min" => Op::ReduceMin,
+            "quantize"        => Op::Quantize,
+            "dequantize"      => Op::Dequantize,
+            "quant_gemm"      => Op::QuantGemm,
+            "quant_attention" => Op::QuantAttention,
             other => Op::Custom(other.to_string()),
         }
     }
@@ -145,6 +155,10 @@ pub fn core_op_table() -> Vec<OpDef> {
         OpDef { op: Op::Store, mnemonic: "store", num_operands: 2, has_result: false, category: OpCategory::Memory, doc: "Store value into memref" },
         OpDef { op: Op::Gemm, mnemonic: "gemm", num_operands: 3, has_result: true, category: OpCategory::Matrix, doc: "General matrix multiply: C = alpha*A*B + beta*C" },
         OpDef { op: Op::Return, mnemonic: "return", num_operands: 0, has_result: false, category: OpCategory::Control, doc: "Return from function or kernel" },
+        OpDef { op: Op::Quantize,      mnemonic: "quantize",        num_operands: 1, has_result: true,  category: OpCategory::Matrix, doc: "Quantize f32 tensor to integer with scale and zero-point" },
+        OpDef { op: Op::Dequantize,    mnemonic: "dequantize",      num_operands: 1, has_result: true,  category: OpCategory::Matrix, doc: "Dequantize integer tensor to f32 with scale and zero-point" },
+        OpDef { op: Op::QuantGemm,     mnemonic: "quant_gemm",      num_operands: 3, has_result: true,  category: OpCategory::Matrix, doc: "Integer matrix multiply with inline dequantization: C_f32 = dequant(A_int * B_int)" },
+        OpDef { op: Op::QuantAttention, mnemonic: "quant_attention", num_operands: 4, has_result: true, category: OpCategory::Matrix, doc: "Quantized flash-attention: softmax(Q*K^T/sqrt(d_k))*V with int4/int8 inputs" },
     ]
 }
 
@@ -154,7 +168,10 @@ mod tests {
 
     #[test]
     fn roundtrip_display_parse() {
-        let ops = [Op::Addi, Op::Mulf, Op::Gemm, Op::Load, Op::Return];
+        let ops = [
+            Op::Addi, Op::Mulf, Op::Gemm, Op::Load, Op::Return,
+            Op::Quantize, Op::Dequantize, Op::QuantGemm, Op::QuantAttention,
+        ];
         for op in &ops {
             assert_eq!(Op::from_str(&op.to_string()), *op);
         }

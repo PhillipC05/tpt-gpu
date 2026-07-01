@@ -95,7 +95,12 @@ pub fn validate_region(region: &Region) -> ValidationResult {
                 OpKind::Branch => 0,
                 OpKind::Return => 0,
                 OpKind::Constant(_) => 0,
-                OpKind::Custom(_) => 1, // custom ops expect at least 1 operand
+                OpKind::Gemm => 3,        // A, B, C
+                OpKind::Quantize => 1,    // input tensor
+                OpKind::Dequantize => 1,  // quantized tensor
+                OpKind::QuantGemm => 3,   // A_int, B_int, C_f32
+                OpKind::QuantAttention => 4, // Q, K, V, mask
+                OpKind::Custom(_) => 1,
             };
             if op.operands.len() != expected && !matches!(op.kind, OpKind::Custom(_)) {
                 errors.push(ValidationError::WrongOperandCount {

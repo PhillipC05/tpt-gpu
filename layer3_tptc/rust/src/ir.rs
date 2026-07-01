@@ -25,7 +25,7 @@ impl fmt::Display for Type{
    TypeKind::None=>write!(f,"none"),
 }}}
 #[derive(Debug,Clone)]
-pub enum OpKind{Addi,Subi,Muli,Addf,Subf,Mulf,And,Or,Xor,CmpEq,CmpLt,Load,Store,Branch,Return,Constant(String),Custom(String)}
+pub enum OpKind{Addi,Subi,Muli,Addf,Subf,Mulf,And,Or,Xor,CmpEq,CmpLt,Load,Store,Branch,Return,Constant(String),Custom(String),Gemm,Quantize,Dequantize,QuantGemm,QuantAttention}
 
 impl fmt::Display for OpKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -47,6 +47,11 @@ impl fmt::Display for OpKind {
             OpKind::Return => write!(f, "return"),
             OpKind::Constant(v) => write!(f, "constant {}", v),
             OpKind::Custom(v) => write!(f, "custom {}", v),
+            OpKind::Gemm => write!(f, "gemm"),
+            OpKind::Quantize => write!(f, "quantize"),
+            OpKind::Dequantize => write!(f, "dequantize"),
+            OpKind::QuantGemm => write!(f, "quant_gemm"),
+            OpKind::QuantAttention => write!(f, "quant_attention"),
         }
     }
 }
@@ -79,6 +84,9 @@ impl Operation{
    OpKind::Load=>"load",OpKind::Store=>"store",
    OpKind::Branch=>"br",OpKind::Return=>"return",
    OpKind::Constant(v)=>return format!("constant {}",v),
+   OpKind::Gemm=>"gemm",
+   OpKind::Quantize=>"quantize",OpKind::Dequantize=>"dequantize",
+   OpKind::QuantGemm=>"quant_gemm",OpKind::QuantAttention=>"quant_attention",
    _=>"custom",
   }.to_string()
  }
@@ -132,7 +140,8 @@ pub struct GeneratedKernel{
 /// TPTIR assembly operation kinds produced by the TPTIR text emitter.
 #[derive(Debug,Clone,Copy,PartialEq)]
 pub enum TptirOp{
- Addi,Subi,Muli,Addf,Subf,Mulf,And,Or,Xor,CmpEq,CmpLt,Load,Store,Branch,Return,Constant,Custom
+ Addi,Subi,Muli,Addf,Subf,Mulf,And,Or,Xor,CmpEq,CmpLt,Load,Store,Branch,Return,Constant,Custom,
+ Gemm,Quantize,Dequantize,QuantGemm,QuantAttention,
 }
 
 impl TptirOp{
@@ -144,6 +153,9 @@ impl TptirOp{
   TptirOp::Load=>"load",TptirOp::Store=>"store",
   TptirOp::Branch=>"br",TptirOp::Return=>"return",
   TptirOp::Constant=>"constant",TptirOp::Custom=>"custom",
+  TptirOp::Gemm=>"gemm",
+  TptirOp::Quantize=>"quantize",TptirOp::Dequantize=>"dequantize",
+  TptirOp::QuantGemm=>"quant_gemm",TptirOp::QuantAttention=>"quant_attention",
  }}
 }
 
@@ -157,6 +169,9 @@ pub fn opkind_to_tptir(op:&OpKind)->TptirOp{
   OpKind::Load=>TptirOp::Load,OpKind::Store=>TptirOp::Store,
   OpKind::Branch=>TptirOp::Branch,OpKind::Return=>TptirOp::Return,
   OpKind::Constant(_)=>TptirOp::Constant,OpKind::Custom(_)=>TptirOp::Custom,
+  OpKind::Gemm=>TptirOp::Gemm,
+  OpKind::Quantize=>TptirOp::Quantize,OpKind::Dequantize=>TptirOp::Dequantize,
+  OpKind::QuantGemm=>TptirOp::QuantGemm,OpKind::QuantAttention=>TptirOp::QuantAttention,
  }
 }
 

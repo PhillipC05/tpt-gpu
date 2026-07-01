@@ -63,6 +63,9 @@ pub fn download(registry: &mut ModelRegistry, params: HfDownload) -> Result<Path
         size_gb: params.size_gb,
         sha256:  params.expected_sha256,
         source:  Some(params.url),
+        quant_bits:     None,
+        pruned_domains: None,
+        source_model:   None,
     })?;
 
     Ok(dest)

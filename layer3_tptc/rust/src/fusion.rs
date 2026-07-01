@@ -16,6 +16,8 @@ pub enum FusedPattern {
     FlashAttention,
     /// Conv + BN + ReLU fusion.
     ConvBnRelu,
+    /// Dequantize → Gemm → single QuantGemm (avoids materializing f32 weights).
+    QuantGemmFuse,
 }
 
 /// Result of pattern matching.
@@ -82,6 +84,21 @@ pub fn detect_patterns(block: &Block) -> Vec<FusionResult> {
             }
         }
 
+        // Check for QuantGemmFuse pattern: Dequantize → Gemm
+        // Fuses into a single QuantGemm, avoiding f32 weight materialization.
+        if i + 1 < ops.len() {
+            if matches!(&ops[i].kind, OpKind::Dequantize) &&
+               matches!(&ops[i + 1].kind, OpKind::Gemm) {
+                results.push(FusionResult {
+                    pattern: FusedPattern::QuantGemmFuse,
+                    start_op: i,
+                    end_op: i + 1,
+                });
+                i += 2;
+                continue;
+            }
+        }
+
         i += 1;
     }
 
@@ -104,6 +121,9 @@ pub fn apply_fusion(region: &mut Region) -> usize {
                     fused_count += 1;
                 }
                 FusedPattern::ConvBnRelu => {
+                    fused_count += 1;
+                }
+                FusedPattern::QuantGemmFuse => {
                     fused_count += 1;
                 }
             }

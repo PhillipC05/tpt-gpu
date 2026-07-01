@@ -165,3 +165,53 @@
 - [x] `tuning/schema.json`: JSON schema for GPU profiles + CI validation job on `tuning/` PRs (`.github/workflows/validate-profiles.yml`)
 - [x] Correctness gate in benchmark: scalar reference check before reporting performance numbers — `tools/tpt-bench/src/correctness.rs`
 - [x] Community scoreboard: auto-update `BENCHMARKS.md` from submitted `results/<gpu>-<ts>.json` files — `tools/tpt-bench/src/scoreboard.rs`; `tpt-bench --scoreboard`; `.github/workflows/scoreboard.yml`
+
+---
+
+## Phase 6: Model Optimizer (`tools/model-optimizer/`)
+
+**Goal:** Take any GGUF model and produce the smallest possible output with ≤ 5% quality loss. Output is the native `.tptf` format (self-contained: weights + tokenizer + chat template); re-export to GGUF/EXL2 for compatibility.
+
+### TPTIR / Compiler Extensions
+- [x] Add `Quantize`, `Dequantize`, `QuantGemm`, `QuantAttention` ops to `crates/tptir-spec/src/ops.rs`
+- [x] Add `I2`, `I4`, `I6` sub-byte element types to `crates/tptir-spec/src/types.rs`
+- [x] Add `QuantizationPass` to `layer3_tptc/rust/src/passes.rs`
+- [x] Add `QuantGemmFuse` pattern (Dequantize → Gemm → QuantGemm) to `layer3_tptc/rust/src/fusion.rs`
+- [x] Add operand count rules for quant ops in `layer3_tptc/rust/src/validate.rs`
+
+### Runtime / Primitives
+- [x] Extend `ModelInfo` with `per_layer_bits` and `pruning_mask`; add `parse_tptf_header()` to `layer4_tptr/tptr-core/src/inference.rs`
+- [x] `QuantGemmKernel` in `layer5_tptp/tptp-core/src/kernels/quant_gemm.rs` — INT4/INT8 GEMM with vendor dispatch + TPTIR fallback
+- [x] `layer5_tptp/tptir/tptir_quant_gemm.mlir` — fused dequant + matmul TPTIR kernel
+
+### Model Registry
+- [x] Extend `ModelEntry` with `quant_bits`, `pruned_domains`, `source_model` fields (`tools/model-registry/src/lib.rs`)
+
+### Model Optimizer Tool (`tools/model-optimizer/`)
+- [x] `Cargo.toml` — dependencies: tptr-core, model-registry, tptir-spec, tpt-shared, serde, byteorder, memmap2
+- [x] `src/profiler.rs` — `HardwareProfiler`: benchmark memory BW, L2 cache, tensor cores; disk cache keyed by GPU UUID
+- [x] `src/sensitivity.rs` — `LayerSensitivityMap`: U-shaped heuristic pre-pass; ranks layers from least to most sensitive
+- [x] `src/domain_mapper.rs` — `DomainMapper`: Wanda-style importance scoring (|weight| × mean(|activation|)); builds per-layer neuron→domain map
+- [x] `src/pruner.rs` — `SurgicalPruner`: structural pruning (whole neurons); produces `PruningMask` embedded in `.tptf`
+- [x] `src/quant_allocator.rs` — `MixedPrecisionAllocator`: "5% loss frontier" — tries [2,3,4,6,8]-bit per layer in sensitivity order
+- [x] `src/kv_calculator.rs` — `KvCacheCalculator`: computes max context window from remaining VRAM after model footprint
+- [x] `src/calibration.rs` — `CalibrationGenerator`: domain-specific hard prompts; cached to `~/.tpt/calibration_cache.json`
+- [x] `src/benchmark.rs` — `QualityBenchmark`: perplexity (bits-per-token) + task accuracy; `BenchmarkResult::print_report()`
+- [x] `src/streaming.rs` — `StreamingLoader`: layer-by-layer mmap processing for 70B+ models (auto when model > 80% free VRAM)
+- [x] `src/tptf_format.rs` — `TptfWriter` / `read_header()`: 512-byte TPTF header, tensor blocks, tokenizer + chat template sections
+- [x] `src/export/detect.rs` — `detect()`: magic-byte format detection (TPTF / GGUF / EXL2)
+- [x] `src/export/gguf.rs` — `GgufExporter`: `.tptf` → GGUFv3; maps bit depths to Q2_K/Q3_K/Q4_K/Q6_K/Q8_0/F16
+- [x] `src/export/exl2.rs` — `Exl2Exporter`: `.tptf` → EXL2 directory (config.json, quant_config.json, safetensors)
+- [x] `src/main.rs` — CLI: `profile`, `analyze`, `optimize`, `export`, `bench`, `kv-calc` subcommands
+
+### Remaining / Production Hardening
+- [ ] `sensitivity.rs` still scores via `heuristic_sensitivity()` (U-shaped edge heuristic); `LayerSensitivityMap::build()` needs to call a live per-layer quantize + calibration-set perplexity eval instead
+- [ ] `activation_capture.rs` hooks (`ActivationCapture`, `ActivationCaptureExt`) exist but have zero implementors — not wired into `GpuInferenceEngine`'s forward pass, so nothing ever calls `.record()` with real activations
+- [ ] `domain_mapper.rs::build()` is still the heuristic path (`neuron_idx % domains.len()`); the real path `build_from_activations()` exists but is never called — needs `GpuInferenceEngine` activation capture (previous item) wired in, plus real domain clustering instead of modulo assignment
+- [x] `quant_allocator.rs`'s `MixedPrecisionAllocator::allocate()` now takes a live `eval_fn(layer_idx, bits) -> ppl` callback (no more hardcoded `simulate_ppl_at_bits()`) — but `QuantEvaluator::create_eval_callback()`, the only concrete callback provided, still returns a simulated formula (`10.0 * (1.0 + 0.15*(8-bits)/8)`) instead of actually quantizing + running inference
+- [x] `tptf_format.rs` — real bit-packing implemented in `quant_allocator::quantize_tensor`/`dequantize_tensor` (sub-byte packing, group scales/zero-points), used by the TPTF writer
+- [x] `export/gguf.rs` and `export/exl2.rs` — real tensor repacking implemented (read TPTF header/tensor blocks, remap bit depths to GGUF quant types / write EXL2 safetensors + config JSON)
+- [ ] `calibration.rs`'s `AiProviderWrapper` is still a scaffold — `detect()` only checks server reachability and `generate_with_ai()`'s comment says "In production, this would call the actual provider API"; no real `AiProvider::complete()` call is wired in
+- [ ] End-to-end integration test: optimize a small GGUF → verify `.tptf` round-trips → verify quality within 5% (no test file found anywhere in `tools/model-optimizer`)
+- [x] `model-optimizer analyze` command: `cmd_analyze()` in `main.rs` writes `domain_map.json` (though the map it writes is still the heuristic one, per above)
+- [x] Public documentation: `docs/optimizer-pipeline.md` covers the pipeline and `.tptf` format spec
