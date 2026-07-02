@@ -8,7 +8,7 @@
 //! 5. Produce a DomainMap: layer → [(neuron_idx, domain, importance_score)].
 
 use anyhow::Result;
-use crate::activation_capture::{ActivationMap, LayerActivations};
+use crate::activation_capture::ActivationMap;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
@@ -224,6 +224,8 @@ mod tests {
 
     #[test]
     fn build_from_activations() {
+        use crate::activation_capture::LayerActivations;
+        
         let mut act_map = ActivationMap::default();
         act_map.ffn_dim = 4;
         act_map.layers.insert(0, LayerActivations {
@@ -248,7 +250,10 @@ mod tests {
         ];
         let importance = compute_weight_importance(&weights, 4);
         assert_eq!(importance.len(), 4);
-        // Column sums: 1.5, 0.5, 3.5, 3.5
-        assert!((importance[0] - 1.5).abs() < 0.01);
+        // Column sums: 1.5, 0.5, 3.5, 3.5, normalized by max=3.5
+        // importance[0] = 1.5 / 3.5 ≈ 0.43
+        assert!((importance[0] - 1.5 / 3.5).abs() < 0.01);
+        // importance[2] = 3.5 / 3.5 = 1.0 (max)
+        assert!((importance[2] - 1.0).abs() < 0.01);
     }
 }

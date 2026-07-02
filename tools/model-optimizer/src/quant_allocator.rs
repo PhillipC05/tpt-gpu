@@ -20,7 +20,8 @@ use std::path::PathBuf;
 /// Bit depth candidates to evaluate per layer (ascending).
 const BIT_CANDIDATES: &[u8] = &[2, 3, 4, 6, 8];
 
-/// Default group size for group-wise quantization
+/// Default group size for group-wise quantization (used in scaffold)
+#[allow(dead_code)]
 const DEFAULT_GROUP_SIZE: usize = 128;
 
 /// Configuration for quantization evaluation
@@ -240,9 +241,9 @@ pub fn dequantize_tensor(
 
 /// Evaluate perplexity using the inference engine
 pub struct QuantEvaluator {
-    /// Baseline f32 model path
+    /// Baseline f32 model path (can be .gguf or .tptf)
     pub baseline_model: PathBuf,
-    /// Calibration samples
+    /// Calibration samples for quality evaluation
     pub samples: Vec<CalibrationSample>,
     /// Number of tokens to evaluate per sample
     pub eval_tokens: u32,
@@ -262,17 +263,26 @@ impl QuantEvaluator {
         self
     }
 
-    /// Create a per-layer evaluation callback
+    /// Create a per-layer evaluation callback for live perplexity measurement.
+    /// 
+    /// In production, this would:
+    /// 1. Load the model from baseline_model
+    /// 2. Apply per-layer quantization according to the current bits configuration
+    /// 3. Run inference on calibration samples
+    /// 4. Compute cross-entropy loss vs expected tokens
+    /// 5. Return perplexity
+    /// 
+    /// For scaffold: returns simulated perplexity based on bit depth.
     pub fn create_eval_callback(&self, _per_layer_bits: &[u8]) -> Result<impl Fn(usize, u8) -> Result<f32>> {
-        Ok(move |_layer_idx, _target_bits| {
-            // In production: would:
-            // 1. Create temporary copy of model
-            // 2. Quantize the specific layer to target_bits
-            // 3. Run inference on calibration samples
-            // 4. Compute perplexity
+        Ok(move |_layer_idx: usize, target_bits: u8| {
+            // Production path would:
+            // 1. Load model from baseline_model
+            // 2. Apply quantization with target_bits for the layer
+            // 3. Run inference on samples
+            // 4. Compute perplexity from cross-entropy
             
-            // For scaffold: simulate improvement with higher bits
-            let simulated = 10.0 * (1.0 + 0.15 * (8 - _target_bits) as f32 / 8.0);
+            // Scaffold: simulate improvement - higher bits = lower perplexity impact
+            let simulated = 10.0 * (1.0 + 0.15 * (8 - target_bits) as f32 / 8.0);
             Ok(simulated)
         })
     }

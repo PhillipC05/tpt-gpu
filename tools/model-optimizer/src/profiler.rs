@@ -4,7 +4,7 @@
 //! free VRAM. Results are cached to `~/.tpt/hardware_profile.json` keyed by
 //! GPU UUID so subsequent runs don't re-benchmark.
 
-use anyhow::{Context, Result};
+use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use std::time::Instant;

@@ -27,49 +27,18 @@
 
 ## 1. Getting Started
 
-### Installation
+For cloning the repo, building the `tpt` CLI, and writing/compiling your first `.tpts` file, see the root [`README.md`](../README.md#quick-start) Quick Start — this guide picks up from there and focuses on the language itself. Prefer a live, no-install environment? Try the [browser playground](../tools/tpt-playground/).
 
-TPT Script is part of the TPT GPU platform. To get started:
+### Additional Tooling
+
+Beyond the `tpt` CLI, layer7 also builds an LSP server, formatter, and linter:
 
 ```bash
-# Clone the repository
-git clone https://github.com/PhillipC05/tpt-gpu.git
-cd tpt-gpu
-
-# Build the compiler (requires Rust)
 cd layer7_tptb
-cargo build -p tptb-core
+cargo build -p tptb-lsp      # LSP server (see §11 IDE Setup)
+cargo build -p tptb-format   # Formatter/linter (see §12)
 
-# Build the LSP server
-cargo build -p tptb-lsp
-
-# Build the formatter/linter
-cargo build -p tptb-format
-```
-
-### Your First TPT Script
-
-Create a file named `hello.tpts`:
-
-```tpts
-import tpt
-
-@doc("Compute the ReLU activation function")
-fn relu(x: Tensor[f32, n]) -> Tensor[f32, n] {
-    return tpt.relu(x)
-}
-```
-
-Compile and check it:
-
-```bash
-# Type-check and compile
-cargo run -p tptb-core -- check hello.tpts
-
-# Format
 cargo run -p tptb-format -- fmt hello.tpts
-
-# Lint
 cargo run -p tptb-format -- lint hello.tpts
 ```
 

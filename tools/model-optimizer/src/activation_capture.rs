@@ -132,7 +132,7 @@ mod tests {
 
     #[test]
     fn captures_layer_activations() {
-        let mut capture = ActivationCapture::new(128);
+        let mut capture = ActivationCapture::new(8);
         
         // Record some fake activations
         capture.record(0, &[1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0]);

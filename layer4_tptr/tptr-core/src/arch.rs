@@ -221,6 +221,8 @@ mod tests {
             num_kv_heads: 8,
             ffn_dim: 11008,
             num_layers,
+            per_layer_bits: Vec::new(),
+            pruning_mask: None,
         }
     }
 

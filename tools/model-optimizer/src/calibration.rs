@@ -10,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
+use tpt_shared::AiProvider;
 
 /// A single calibration prompt with an expected response for scoring.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -32,65 +33,8 @@ pub struct CalibrationGenerator {
     domains: Vec<String>,
     samples_per_domain: usize,
     cache_path: PathBuf,
-    /// Optional AI provider for generating hard prompts
-    ai_provider: Option<AiProviderWrapper>,
-}
-
-/// Wrapper for optional AI provider (avoids hard dependency)
-#[derive(Clone)]
-pub struct AiProviderWrapper {
-    /// Provider name ("claude", "openrouter", "ollama")
-    pub provider_name: String,
-    /// Whether provider is available
-    pub is_available: bool,
-}
-
-impl Default for AiProviderWrapper {
-    fn default() -> Self {
-        Self::detect()
-    }
-}
-
-impl AiProviderWrapper {
-    /// Detect available AI provider from environment
-    pub fn detect() -> Self {
-        // Try Claude first
-        if std::env::var("ANTHROPIC_API_KEY").is_ok() {
-            return AiProviderWrapper {
-                provider_name: "claude".to_string(),
-                is_available: true,
-            };
-        }
-        
-        // Try OpenRouter
-        if std::env::var("OPENROUTER_API_KEY").is_ok() {
-            return AiProviderWrapper {
-                provider_name: "openrouter".to_string(),
-                is_available: true,
-            };
-        }
-        
-        // Ollama doesn't require an API key but needs server running
-        // For scaffold, check if server is reachable
-        AiProviderWrapper {
-            provider_name: "none".to_string(),
-            is_available: false,
-        }
-    }
-    
-    /// Generate a hard prompt using AI
-    pub fn generate_prompt(&self, domain: &str) -> Result<String> {
-        if !self.is_available {
-            return Err(anyhow::anyhow!("No AI provider available for prompt generation"));
-        }
-        
-        // In production, this would call the actual provider API
-        // For now, return a meta-prompt that describes what we want
-        let _system = "You are a prompt generator for LLM quality evaluation. Generate a single, challenging question or task in the specified domain that would expose weaknesses in a model's knowledge.";
-        let _user = format!("Generate a challenging {} question that tests domain-specific knowledge. Make it specific, technical, and require deep understanding. Reply with just the prompt.", domain);
-        
-        Ok(format!("{} (AI-generated via {})", heuristic_prompt(domain, 0).0, self.provider_name))
-    }
+    /// Optional AI provider for generating hard prompts (wrapped for Send + Sync)
+    ai_provider: Option<Box<dyn AiProvider>>,
 }
 
 impl CalibrationGenerator {
@@ -99,7 +43,7 @@ impl CalibrationGenerator {
             domains,
             samples_per_domain: 32,
             cache_path: cache_path(),
-            ai_provider: Some(AiProviderWrapper::detect()),
+            ai_provider: None,
         }
     }
 
@@ -108,24 +52,37 @@ impl CalibrationGenerator {
         self
     }
 
+    /// Set an AI provider for generating prompts
+    pub fn with_provider(mut self, provider: Box<dyn AiProvider>) -> Self {
+        self.ai_provider = Some(provider);
+        self
+    }
+
+    /// Set an AI provider from environment variables (claude, openrouter, or ollama)
+    pub fn with_provider_from_env(self) -> Self {
+        match tpt_shared::provider_from_env() {
+            p => self.with_provider(p),
+        }
+    }
+
+    /// Check if AI provider is available
+    pub fn has_ai_provider(&self) -> bool {
+        self.ai_provider.as_ref().map(|p| p.is_available()).unwrap_or(false)
+    }
+
     /// Return calibration samples, loading from cache when possible.
     pub fn generate(&self) -> Result<Vec<CalibrationSample>> {
         let hash = self.domain_hash();
         if let Some(cached) = self.load_cache(hash)? {
             return Ok(cached);
         }
-        
-        // Try to generate using AI provider
-        let samples = if let Some(ref provider) = self.ai_provider {
-            if provider.is_available {
-                self.generate_with_ai(provider)?
-            } else {
-                self.generate_heuristic()
-            }
-        } else {
-            self.generate_heuristic()
+
+        // Try to generate using AI provider, fall back to heuristic
+        let samples = match &self.ai_provider {
+            Some(provider) if provider.is_available() => self.generate_with_ai(provider)?,
+            _ => self.generate_heuristic(),
         };
-        
+
         self.save_cache(hash, &samples)?;
         Ok(samples)
     }
@@ -159,12 +116,16 @@ impl CalibrationGenerator {
     }
 
     /// Generate samples using AI provider
-    fn generate_with_ai(&self, provider: &AiProviderWrapper) -> Result<Vec<CalibrationSample>> {
+    fn generate_with_ai(&self, provider: &Box<dyn AiProvider>) -> Result<Vec<CalibrationSample>> {
         let mut samples = Vec::new();
         for domain in &self.domains {
             for i in 0..self.samples_per_domain {
                 // Use AI-generated prompt if available, fall back to heuristic
-                let prompt = provider.generate_prompt(domain)
+                let prompt = provider
+                    .generate(&format!(
+                        "Generate a challenging {} question that tests domain-specific knowledge. Make it specific, technical, and require deep understanding. Reply with just the prompt.",
+                        domain
+                    ))
                     .unwrap_or_else(|_| heuristic_prompt(domain, i).0);
                 let expected = heuristic_prompt(domain, i).1;
                 samples.push(CalibrationSample {
@@ -178,9 +139,6 @@ impl CalibrationGenerator {
     }
 
     /// Heuristic prompt generation when no AI provider is configured.
-    ///
-    /// In production: calls `AiProvider::complete()` with a meta-prompt asking
-    /// for hard, domain-specific test cases with tricky edge cases.
     fn generate_heuristic(&self) -> Vec<CalibrationSample> {
         let mut samples = Vec::new();
         for domain in &self.domains {
@@ -258,13 +216,5 @@ mod tests {
         assert_eq!(samples.len(), 8); // 2 domains × 4 samples
         assert!(samples.iter().any(|s| s.domain == "sql"));
         assert!(samples.iter().any(|s| s.domain == "python"));
-    }
-
-    #[test]
-    fn ai_provider_wrapper_detection() {
-        std::env::remove_var("ANTHROPIC_API_KEY");
-        std::env::remove_var("OPENROUTER_API_KEY");
-        let wrapper = AiProviderWrapper::detect();
-        assert!(!wrapper.is_available || wrapper.provider_name == "none");
     }
 }

@@ -38,7 +38,7 @@ pub use kv_calculator::KvCacheCalculator;
 pub use calibration::CalibrationGenerator;
 pub use benchmark::QualityBenchmark;
 pub use streaming::StreamingLoader;
-pub use tptf_format::TptfWriter;
+pub use tptf_format::{TptfWriter, TptfHeader, TensorBlock};
 pub use export::detect::ModelFormat;
 pub use activation_capture::{ActivationCapture, ActivationMap, LayerActivations, ActivationCallback};
 

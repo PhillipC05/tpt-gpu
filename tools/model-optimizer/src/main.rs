@@ -158,10 +158,19 @@ fn cmd_optimize(
     println!("          {:.0} GB/s, {} MiB free", profile.bw_gbps, profile.vram_free_mb);
 
     println!("Step 2/5  Building sensitivity map...");
-    // Generate calibration samples for live perplexity evaluation
-    let samples = CalibrationGenerator::new(vec!["general".to_string()])
+    // Generate calibration samples - use AI provider if available, otherwise heuristic
+    let gen = CalibrationGenerator::new(vec!["general".to_string()])
         .with_samples_per_domain(8)
-        .generate()?;
+        .with_provider_from_env();
+    
+    if gen.has_ai_provider() {
+        println!("          Using AI provider for calibration samples");
+    } else {
+        println!("          Using heuristic calibration samples");
+    }
+    
+    let samples = gen.generate()?;
+    
     let sens_config = SensitivityConfig {
         model_path: model.clone(),
         samples,

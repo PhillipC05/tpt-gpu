@@ -316,7 +316,8 @@ fn parse_header(bytes: &[u8]) -> Result<TptfHeader> {
     })
 }
 
-fn write_header<W: Write + Seek>(w: &mut W, h: &TptfHeader) -> Result<()> {
+/// Write a TPTF header to an output stream.
+pub fn write_header<W: Write + Seek>(w: &mut W, h: &TptfHeader) -> Result<()> {
     let mut buf = vec![0u8; HEADER_SIZE];
     {
         let mut cur = Cursor::new(&mut buf);
@@ -423,7 +424,7 @@ mod tests {
     #[test]
     fn tensor_block_quantization() {
         let weights: Vec<f32> = (0..128).map(|i| i as f32 * 0.1).collect();
-        let block = TensorBlock::new(0, "gate_proj", &weights, 4, 32, 32, 4).unwrap();
+        let block = TensorBlock::new(0, "gate_proj", &weights, 4, 32, 32, 32).unwrap();
         
         assert_eq!(block.bits, 4);
         assert_eq!(block.rows, 32);

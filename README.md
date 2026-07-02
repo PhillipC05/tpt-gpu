@@ -16,6 +16,7 @@
 - **LLM Inference Runtime** — `GpuInferenceEngine` with arch-template dispatch (LLaMA 3, Mistral, Qwen2, Phi-3, Gemma 2), sliding-window KV cache, and automatic vendor routing (CUDA → ROCm → Metal → TPTIR)
 - **Shared Model Registry** — GGUF models stored once in `~/.tpt/models/` and shared across all TPT tools
 - **IDE Support** — Full LSP server, VS Code extension, formatter, and linter
+- **Browser Playground** — Try TPT Script live in your browser, no install required: [`tools/tpt-playground/`](tools/tpt-playground/)
 - **Framework Integration** — PyTorch and JAX backends with seamless dispatch
 - **AI-Assisted Kernel Generation** — Automated kernel optimization and generation tools
 - **Comprehensive Documentation** — 17 tutorials, complete language spec, and API reference
@@ -66,6 +67,8 @@ tpt ops
 # Get docs for an operation
 tpt docs matmul
 ```
+
+Looking for a specific end-to-end scenario (training loop, LLM inference, benchmarking, vendor certification)? See [`docs/use-cases.md`](docs/use-cases.md).
 
 ---
 
