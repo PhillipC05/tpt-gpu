@@ -2,7 +2,14 @@
 name = "tptc-rs"
 version = "0.1.0"
 edition = "2021"
+authors = ["TPT GPU Contributors"]
 description = "Rust port of TPTIR compiler stack"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+repository = "https://github.com/tpt-solutions/tpt-gpu"
+documentation = "https://docs.rs/tptc-rs"
+readme = "README.md"
+keywords = ["gpu", "compiler", "ir", "mlir", "tptir"]
+categories = ["compilers", "development-tools"]
 
 [lib]
 name = "tptc_rs"
@@ -17,6 +24,5 @@ ffi = []
 cc = "1"
 
 [dependencies]
-libc = "0.2"
 serde = { workspace = true }
 serde_json = { workspace = true }

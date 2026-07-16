@@ -97,7 +97,6 @@ pub(crate) struct TptCmdDesc {
     pub arg_buf_size:    u32,
     pub shared_mem:      u32,
     pub completion_phys: u64,
-    pub _reserved:       [u8; 8],
 }
 
 #[repr(C)]

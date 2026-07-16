@@ -110,7 +110,7 @@ pub trait VendorLibrary: Send + Sync {
 
 ```bash
 # Clone TPT-GPU repository
-git clone https://github.com/PhillipC05/tpt-gpu.git
+git clone https://github.com/tpt-solutions/tpt-gpu.git
 cd tpt-gpu
 
 # Build with vendor development features
@@ -341,7 +341,7 @@ See the following reference implementations:
 - **Program Inquiries**: `vendor-program@tpt-gpu.org`
 - **Technical Support**: `vendor-tech@tpt-gpu.org`
 - **Certification**: `vendor-cert@tpt-gpu.org`
-- **GitHub**: https://github.com/PhillipC05/tpt-gpu
+- **GitHub**: https://github.com/tpt-solutions/tpt-gpu
 
 ## License
 

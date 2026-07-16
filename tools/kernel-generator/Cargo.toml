@@ -2,17 +2,21 @@
 name = "tpt"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
 description = "TPT GPU kernel generator CLI"
 license.workspace = true
+repository.workspace = true
+documentation = "https://docs.rs/tpt"
+readme = "README.md"
+keywords = ["gpu", "kernels", "codegen", "tptir", "hpc"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "tpt"
 path = "src/main.rs"
 
 [dependencies]
-tptc-rs = { path = "../../layer3_tptc/rust" }
-tpt-shared = { path = "../shared" }
-serde = { workspace = true }
-serde_json = { workspace = true }
+tptc-rs = { path = "../../layer3_tptc/rust", version = "0.1.0" }
+tpt-shared = { path = "../shared", version = "1.0.0" }
 clap = { workspace = true }
 anyhow = { workspace = true }

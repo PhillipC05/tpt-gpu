@@ -102,8 +102,8 @@ mod tests {
         let mut table = DispatchTable::new();
         table.generate_default_entries("RTX_3090");
         assert!(!table.entries.is_empty());
-        // Should have entries for 5 templates * 3 element types = 15
-        assert_eq!(table.entries.len(), 15);
+        // Should have entries for 9 templates * 3 element types = 27
+        assert_eq!(table.entries.len(), 27);
     }
 
     #[test]

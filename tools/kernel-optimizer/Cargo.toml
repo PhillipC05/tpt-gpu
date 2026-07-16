@@ -2,8 +2,14 @@
 name = "tpt-optimizer"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
 license.workspace = true
 description = "Self-iterating TPT GPU kernel parameter optimizer"
+repository.workspace = true
+documentation = "https://docs.rs/tpt-optimizer"
+readme = "README.md"
+keywords = ["gpu", "kernels", "optimization", "autotuning", "hpc"]
+categories = ["command-line-utilities", "development-tools"]
 
 [lib]
 name = "tpt_optimizer"
@@ -14,8 +20,7 @@ name = "tpt-optimizer"
 path = "src/main.rs"
 
 [dependencies]
-tptc-rs = { path = "../../layer3_tptc/rust" }
-tpt-shared = { path = "../shared" }
+tpt-shared = { path = "../shared", version = "1.0.0" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 clap = { workspace = true }

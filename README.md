@@ -1,9 +1,9 @@
 # TPT GPU — Hardware-Agnostic Full-Stack GPU Compute Platform
 
-[![License](https://img.shields.io/badge/license-Apache%202.0%20WITH%20LLVM--exception-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](LICENSE-APACHE)
 [![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org)
 [![Docs](https://img.shields.io/badge/docs-latest-green.svg)](docs/user-guide.md)
-[![CI](https://github.com/PhillipC05/tpt-gpu/actions/workflows/ci.yml/badge.svg)](https://github.com/PhillipC05/tpt-gpu/actions)
+[![CI](https://github.com/tpt-solutions/tpt-gpu/actions/workflows/ci.yml/badge.svg)](https://github.com/tpt-solutions/tpt-gpu/actions)
 
 **TPT GPU** is an open-source, hardware-agnostic, full-stack GPU compute platform designed for AI/ML workloads. It features **TPT Script** — an AI-native programming language with a minimal, orthogonal API surface that LLMs can reason over without truncation.
 
@@ -29,7 +29,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/PhillipC05/tpt-gpu.git
+git clone https://github.com/tpt-solutions/tpt-gpu.git
 cd tpt-gpu
 
 # Build the TPT Script compiler
@@ -217,28 +217,7 @@ cd layer4_tptr/tptr-core && cargo publish
 
 ## Contributing
 
-We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
-### Quick Start for Contributors
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Run tests (`cargo test --workspace`)
-5. Format code (`cargo fmt`)
-6. Commit (`git commit -m 'Add amazing feature'`)
-7. Push (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-### Development Areas
-
-- **Layer 1 (ISA):** SystemVerilog simulation and verification
-- **Layer 2 (Driver):** Kernel module development (Linux, Windows, macOS)
-- **Layer 3 (Compiler):** TPTIR optimization passes and codegen
-- **Layer 4 (Runtime):** Memory management, scheduling, LLM inference
-- **Layer 5 (Primitives):** GPU kernel development and optimization
-- **Layer 6 (Frameworks):** PyTorch/JAX integration
-- **Layer 7 (TPT Script):** Language features and tooling
+This project accepts bug reports and feature requests via [GitHub Issues](https://github.com/tpt-solutions/tpt-gpu/issues). Pull requests are not accepted at this time.
 
 ---
 
@@ -262,9 +241,9 @@ Please see [SECURITY.md](SECURITY.md) for security policies and reporting vulner
 
 ## License
 
-TPT GPU is licensed under the **Apache License 2.0 with LLVM Exception**.
+TPT GPU is dual-licensed under your choice of the **MIT License** or the **Apache License 2.0 with LLVM Exception**.
 
-See [LICENSE](LICENSE) for the full license text.
+See [LICENSE-MIT](LICENSE-MIT) and [LICENSE-APACHE](LICENSE-APACHE) for the full license text.
 
 ---
 

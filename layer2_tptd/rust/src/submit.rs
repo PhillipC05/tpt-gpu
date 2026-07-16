@@ -31,7 +31,6 @@ pub struct CmdDesc {
     pub arg_buf_size:    u32,
     pub shared_mem:      u32,
     pub completion_phys: u64,
-    pub _reserved:       [u8; 8],
 }
 
 const _: () = assert!(
@@ -155,6 +154,5 @@ pub fn make_launch(
         arg_buf_size,
         shared_mem,
         completion_phys,
-        _reserved:       [0u8; 8],
     }
 }

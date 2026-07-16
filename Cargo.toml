@@ -17,10 +17,10 @@ resolver = "2"
 [workspace.package]
 version = "1.0.0"
 edition = "2021"
-license = "Apache-2.0 WITH LLVM-exception"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
 description = "TPT GPU kernel generator and compiler infrastructure"
-authors = ["TPT GPU Contributors"]
-repository = "https://github.com/PhillipC05/tpt-gpu"
+authors = ["TPT Solutions"]
+repository = "https://github.com/tpt-solutions/tpt-gpu"
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }

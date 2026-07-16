@@ -1,0 +1,26 @@
+# tptp-core
+
+TPT Primitives — TPTIR kernel wrappers and vendor library integration for the TPT GPU stack.
+
+## Overview
+
+`tptp-core` provides the host-side Rust wrappers for GPU primitive kernels (GEMM, Attention, Conv2D) expressed in TPTIR. It routes dispatch to the available backend: CUDA, ROCm, Metal, or the pure TPTIR software path.
+
+## Features
+
+- `cuda` — Enable CUDA vendor backend
+- `rocm` — Enable ROCm vendor backend
+- `metal` — Enable Metal vendor backend
+- `tptir-backend` — Enable TPTIR compiler backend (requires `libtptc` at link time)
+- `sim` — Simulation mode for CI / testing without hardware
+
+## Usage
+
+```toml
+[dependencies]
+tptp-core = "1.0"
+```
+
+## License
+
+Apache-2.0 — see the [repository](https://github.com/tpt-solutions/tpt-gpu) for details.

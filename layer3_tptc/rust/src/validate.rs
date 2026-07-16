@@ -152,8 +152,11 @@ mod tests {
     fn test_missing_terminator() {
         let mut region = Region::new();
         let mut block = Block::new("entry");
-        // Add an operation but no terminator
-        let op = Operation::new(OpKind::Addi);
+        // Add an operation (with a correct operand count, to isolate the
+        // missing-terminator check) but no terminator
+        let mut op = Operation::new(OpKind::Addi);
+        op.operands.push(Value::new(0, Type::primitive("i32")));
+        op.operands.push(Value::new(1, Type::primitive("i32")));
         block.operations.push(op);
         region.blocks.push(block);
         let result = validate_region(&region);

@@ -40,4 +40,4 @@ println!("TPTIR: {}", output.tptir_source);
 
 ## License
 
-Licensed under Apache 2.0 WITH LLVM-exception. See [LICENSE](../../LICENSE) for details.
+Dual-licensed under MIT or Apache 2.0 WITH LLVM-exception. See [LICENSE-MIT](../../LICENSE-MIT) / [LICENSE-APACHE](../../LICENSE-APACHE) for details.

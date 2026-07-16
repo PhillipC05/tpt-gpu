@@ -3,7 +3,13 @@ name = "tpt-model-registry"
 version = "0.1.0"
 edition = "2021"
 description = "Shared ~/.tpt/models/ registry for all TPT compute tools"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+authors = ["TPT GPU Contributors"]
+repository = "https://github.com/tpt-solutions/tpt-gpu"
+documentation = "https://docs.rs/tpt-model-registry"
+readme = "README.md"
+keywords = ["gpu", "models", "gguf", "registry", "ml"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "tpt-models"

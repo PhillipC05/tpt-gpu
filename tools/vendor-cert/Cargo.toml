@@ -1,14 +1,15 @@
+[workspace]
+
 [package]
 name = "tpt-vendor-cert"
 version = "0.1.0"
 edition = "2021"
 authors = ["TPT GPU Contributors"]
 description = "TPT-GPU vendor certification test suite"
-license = "Apache-2.0"
-repository = "https://github.com/PhillipC05/tpt-gpu"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+repository = "https://github.com/tpt-solutions/tpt-gpu"
 
 [dependencies]
-tptp-core = { path = "../../layer5_tptp/tptp-core", features = ["sim"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 clap = { version = "4", features = ["derive"] }
@@ -17,14 +18,6 @@ log = "0.4"
 env_logger = "0.11"
 chrono = { version = "0.4", features = ["serde"] }
 
-[dev-dependencies]
-criterion = "0.5"
-
 [[bin]]
 name = "tpt-vendor-cert"
 path = "src/main.rs"
-
-[[bench]]
-name = "vendor_bench"
-path = "benches/vendor_bench.rs"
-harness = false

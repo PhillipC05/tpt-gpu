@@ -313,11 +313,8 @@ tpt bench --contribute
 
 ## Contributing
 
-See `CONTRIBUTING.md` for guidelines on:
-- Adding new GPU tuning profiles
-- Extending the calibration generator
-- Implementing new export formats
+Bug reports and feature requests (new GPU tuning profiles, calibration generator extensions, export formats) are welcome via GitHub Issues. Pull requests are not accepted at this time.
 
 ## License
 
-Apache 2.0 with Express Patent Grant
+Dual-licensed under MIT or Apache 2.0 with LLVM Exception (Express Patent Grant)

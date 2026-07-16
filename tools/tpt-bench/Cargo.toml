@@ -2,8 +2,14 @@
 name = "tpt-bench"
 version.workspace = true
 edition.workspace = true
+authors.workspace = true
 license.workspace = true
 description = "User-runnable dynamic benchmark suite for TPT GPU kernels"
+repository.workspace = true
+documentation = "https://docs.rs/tpt-bench"
+readme = "README.md"
+keywords = ["gpu", "benchmarking", "kernels", "performance", "hpc"]
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "tpt-bench"

@@ -3,7 +3,13 @@ name = "tpt-shared"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+authors.workspace = true
+repository.workspace = true
 description = "Shared AI provider abstraction for TPT GPU tools"
+documentation = "https://docs.rs/tpt-shared"
+readme = "README.md"
+keywords = ["gpu", "ai", "llm", "compiler", "tooling"]
+categories = ["development-tools", "science::ml"]
 
 [lib]
 name = "tpt_shared"
@@ -13,7 +19,6 @@ path = "src/lib.rs"
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
-log = { workspace = true }
 ureq = { version = "2", features = ["json"] }
 
 [dev-dependencies]

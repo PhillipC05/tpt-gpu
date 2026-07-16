@@ -66,7 +66,7 @@ rustup update
 ### Clone and Build
 
 ```bash
-git clone https://github.com/PhillipC05/tpt-gpu.git
+git clone https://github.com/tpt-solutions/tpt-gpu.git
 cd tpt-gpu
 
 # Build the TPT Script compiler (Layer 7)

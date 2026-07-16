@@ -8,8 +8,7 @@ This document tracks the completion of all tasks for the TPT Script v1.0.0 publi
 
 ### Documentation
 - [x] **README.md** - Comprehensive repository overview with badges, quick start, architecture, features
-- [x] **LICENSE** - Apache 2.0 with LLVM Exception
-- [x] **CONTRIBUTING.md** - Contributor guidelines, development setup, coding standards
+- [x] **LICENSE-MIT** / **LICENSE-APACHE** - Dual-licensed under MIT or Apache 2.0 with LLVM Exception
 - [x] **SECURITY.md** - Security policy and vulnerability reporting
 - [x] **CODE_OF_CONDUCT.md** - Contributor Covenant Code of Conduct
 - [x] **CHANGELOG.md** - Complete changelog from v0.1.0-beta to v1.0.0
@@ -109,10 +108,10 @@ This document tracks the completion of all tasks for the TPT Script v1.0.0 publi
 
 ## 🔗 Useful Links
 
-- **Repository:** https://github.com/PhillipC05/tpt-gpu
+- **Repository:** https://github.com/tpt-solutions/tpt-gpu
 - **Documentation:** https://docs.rs/tptb-core
-- **Issues:** https://github.com/PhillipC05/tpt-gpu/issues
-- **Discussions:** https://github.com/PhillipC05/tpt-gpu/discussions
+- **Issues:** https://github.com/tpt-solutions/tpt-gpu/issues
+- **Discussions:** https://github.com/tpt-solutions/tpt-gpu/discussions
 - **Crates.io:** https://crates.io/crates/tptb-core
 
 ---

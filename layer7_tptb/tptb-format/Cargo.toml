@@ -6,9 +6,11 @@ authors.workspace = true
 description = "TPT Script formatter and linter"
 license.workspace = true
 repository.workspace = true
+documentation = "https://docs.rs/tptb-format"
+readme = "README.md"
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
-tptb-core = { path = "../tptb-core" }
+tptb-core = { path = "../tptb-core", version = "1.0.0" }
 serde = { workspace = true }
-serde_json = { workspace = true }
-thiserror = { workspace = true }

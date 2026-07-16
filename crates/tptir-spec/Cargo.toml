@@ -3,10 +3,13 @@ name = "tptir-spec"
 version = "0.1.0"
 edition = "2021"
 description = "TPTIR dialect specification — ops, types, attributes, and stable text-format serialization"
-license = "Apache-2.0"
-repository = "https://github.com/PhillipC05/tpt-gpu"
-keywords = ["gpu", "compiler", "ir", "mlir"]
-categories = ["compilers"]
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+authors = ["TPT GPU Contributors"]
+repository = "https://github.com/tpt-solutions/tpt-gpu"
+documentation = "https://docs.rs/tptir-spec"
+readme = "README.md"
+keywords = ["gpu", "compiler", "ir", "mlir", "tptir"]
+categories = ["compilers", "development-tools"]
 
 [features]
 default = []

@@ -198,7 +198,6 @@ typedef struct __attribute__((aligned(64))) tpt_cmd_desc {
     uint32_t arg_buf_size;     /**< argument buffer size in bytes */
     uint32_t shared_mem_bytes; /**< dynamic shared memory per CTA */
     uint64_t completion_phys;  /**< PA to write 1 when done (0 = none) */
-    uint8_t  _reserved[8];
 } tpt_cmd_desc_t;
 
 _Static_assert(sizeof(tpt_cmd_desc_t) == 64, "tpt_cmd_desc must be 64 bytes");

@@ -3,7 +3,8 @@ name = "tptr-py"
 version = "0.1.0"
 edition = "2021"
 description = "TPT Runtime - Python bindings via PyO3"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+publish = false
 
 [lib]
 crate-type = ["cdylib"]

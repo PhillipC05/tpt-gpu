@@ -7,10 +7,9 @@ description = "TPT Script compiler frontend -- lexer, AST, and parser"
 license.workspace = true
 repository.workspace = true
 documentation = "https://docs.rs/tptb-core"
-homepage = "https://github.com/PhillipC05/tpt-gpu"
 readme = "README.md"
-keywords = ["gpu", "compiler", "ml", "ai", "tptscript", "tptir"]
-categories = ["compilers", "development-tools", "science"]
+keywords.workspace = true
+categories.workspace = true
 rust-version = "1.75"
 
 [dependencies]

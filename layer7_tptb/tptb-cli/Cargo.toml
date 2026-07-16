@@ -6,10 +6,14 @@ authors.workspace = true
 description = "tpt — command-line interface for the TPT Script compiler"
 license.workspace = true
 repository.workspace = true
+documentation = "https://docs.rs/tptb-cli"
+readme = "README.md"
+keywords.workspace = true
+categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
 name = "tpt"
 path = "src/main.rs"
 
 [dependencies]
-tptb-core = { path = "../tptb-core" }
+tptb-core = { path = "../tptb-core", version = "1.0.0" }

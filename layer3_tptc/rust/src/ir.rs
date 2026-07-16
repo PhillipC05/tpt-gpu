@@ -218,6 +218,12 @@ pub fn emit_tptir(region:&Region, entry_name:&str, kernel_attrs:&[(String,String
      format!("tptir.constant {} : {}", val, ty)
     }
     TptirOp::Custom=>String::from(""),
+    TptirOp::Gemm|TptirOp::Quantize|TptirOp::Dequantize|
+    TptirOp::QuantGemm|TptirOp::QuantAttention=>{
+     let ty=op.result_type.as_ref().map(|t|t.to_string()).unwrap_or_default();
+     if ty.is_empty(){ format!("tptir.{}({})", to.name(), oo) }
+     else { format!("tptir.{}({}) : {}", to.name(), oo, ty) }
+    }
    };
    if !oper_str.is_empty(){
     out.push_str(&format!("      {}{}\n", lhs, oper_str));

@@ -1,5 +1,5 @@
 use std::ffi::{CStr, CString};
-use std::os::raw::{c_char, c_int, c_void};
+use std::os::raw::{c_char, c_int};
 #[repr(C)]
 pub enum TptirStatus { Ok = 0, ErrorGeneric = -1, ErrorParse = -2, ErrorNullPointer = -7 }
 #[repr(C)]
@@ -7,8 +7,6 @@ pub struct TptirString { pub data: *mut c_char, pub size: usize }
 #[repr(C)]
 pub struct TptirVersion { pub major: u32, pub minor: u32, pub patch: u32 }
 extern "C" {
-    fn tptir_init(ctx: *mut *mut c_void) -> c_int;
-    fn tptir_shutdown(ctx: *mut c_void) -> c_int;
     fn tptir_get_version() -> TptirVersion;
     fn tptir_compile(source: *const c_char, len: usize, target: c_int, out: *mut TptirString, err: *mut TptirString) -> c_int;
     fn tptir_string_free(s: *mut TptirString);

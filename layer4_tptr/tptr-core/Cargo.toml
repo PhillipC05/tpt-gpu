@@ -3,11 +3,14 @@ name = "tptr-core"
 version = "0.1.0"
 edition = "2021"
 description = "TPT Runtime - Core library"
-license = "Apache-2.0"
+license = "MIT OR Apache-2.0 WITH LLVM-exception"
+authors = ["TPT GPU Contributors"]
+repository = "https://github.com/tpt-solutions/tpt-gpu"
+documentation = "https://docs.rs/tptr-core"
+readme = "README.md"
+keywords = ["gpu", "runtime", "compute", "inference", "hpc"]
+categories = ["hardware-support", "science::ml"]
 
 [dependencies]
-thiserror = "2"
-parking_lot = "0.12"
-log = "0.4"
 bytemuck = "1.21"
-tptp-core = { path = "../../layer5_tptp/tptp-core" }
+tptp-core = { path = "../../layer5_tptp/tptp-core", version = "1.0.0" }
