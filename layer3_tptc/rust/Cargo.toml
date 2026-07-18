@@ -1,18 +1,18 @@
 ﻿[package]
-name = "tptc-rs"
+name = "tpt-gpu-compiler"
 version = "0.1.0"
 edition = "2021"
 authors = ["TPT GPU Contributors"]
 description = "Rust port of TPTIR compiler stack"
 license = "MIT OR Apache-2.0 WITH LLVM-exception"
 repository = "https://github.com/tpt-solutions/tpt-gpu"
-documentation = "https://docs.rs/tptc-rs"
+documentation = "https://docs.rs/tpt-gpu-compiler"
 readme = "README.md"
 keywords = ["gpu", "compiler", "ir", "mlir", "tptir"]
 categories = ["compilers", "development-tools"]
 
 [lib]
-name = "tptc_rs"
+name = "tpt_gpu_compiler"
 crate-type = ["lib", "cdylib"]
 
 [features]

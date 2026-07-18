@@ -8,7 +8,7 @@
 use std::io::{Write, Seek};
 use std::path::PathBuf;
 use anyhow::Result;
-use tpt_model_optimizer::{
+use tpt_gpu_model_optimizer::{
     domain_mapper::DomainMapper,
     quant_allocator::{MixedPrecisionAllocator, QuantEvalConfig},
     sensitivity::{LayerSensitivityMap, SensitivityConfig},

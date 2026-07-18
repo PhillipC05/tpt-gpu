@@ -10,7 +10,7 @@
 
 use clap::{Parser, Subcommand};
 use std::collections::HashMap;
-use tpt_optimizer::*;
+use tpt_gpu_kernel_optimizer::*;
 
 #[derive(Parser)]
 #[command(name = "tpt-optimizer", version, about = "TPT GPU kernel parameter optimizer")]
@@ -161,7 +161,7 @@ fn handle_climb(
 fn handle_ai(kernel: String, iterations: usize) -> anyhow::Result<()> {
     let space = ParamSpace::for_kernel(&kernel)
         .map_err(|e| anyhow::anyhow!(e))?;
-    let provider = tpt_shared::provider_from_env();
+    let provider = tpt_gpu_shared::provider_from_env();
     println!("AI-guided search: {} -- provider: {} -- {} iterations",
         kernel, provider.name(), iterations);
     let start = TuningParams(HashMap::from([
@@ -193,7 +193,7 @@ fn handle_optimize(
         hc_result.score, hc_result.params.display(), hc_result.eval_count);
     let final_result = if ai {
         println!("[3/3] AI-guided refinement ({} iterations)...", ai_iters);
-        let provider = tpt_shared::provider_from_env();
+        let provider = tpt_gpu_shared::provider_from_env();
         println!("  provider: {}", provider.name());
         let r = ai_guided_search(
             &space, &hc_result.params, &eval, provider.as_ref(), &kernel, ai_iters,

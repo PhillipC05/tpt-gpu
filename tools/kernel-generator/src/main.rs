@@ -1,4 +1,4 @@
-﻿//! TPT GPU kernel generator CLI.
+//! TPT GPU kernel generator CLI.
 //!
 //! Usage:
 //!   tpt generate <kernel> [--elem <type>] [--shape <shape>]
@@ -74,9 +74,9 @@ fn main() -> anyhow::Result<()> {
             println!("Generating kernel: {} (elem={}, shape={})", kernel, elem, shape);
             let elem_type = parse_elem(&elem)?;
             let shape_params = parse_shape(&shape)?;
-            let region = tptc_rs::ir::build_kernel_region(&kernel, elem_type, &shape_params)
+            let region = tpt_gpu_compiler::ir::build_kernel_region(&kernel, elem_type, &shape_params)
                 .map_err(|e| anyhow::anyhow!(e))?;
-            let tptir = tptc_rs::ir::emit_tptir(
+            let tptir = tpt_gpu_compiler::ir::emit_tptir(
                 &region,
                 &kernel,
                 &[("tptir.kernel".to_string(), "".to_string())],
@@ -91,9 +91,9 @@ fn main() -> anyhow::Result<()> {
         Commands::Validate { file } => {
             println!("Validating: {}", file.display());
             let source = std::fs::read_to_string(&file)?;
-            let region = tptc_rs::ir::parse_assembly(&source)
+            let region = tpt_gpu_compiler::ir::parse_assembly(&source)
                 .map_err(|e| anyhow::anyhow!(e))?;
-            let result = tptc_rs::validate::validate_region(&region);
+            let result = tpt_gpu_compiler::validate::validate_region(&region);
             if result.is_valid() {
                 println!("Validation passed!");
             } else {
@@ -107,13 +107,13 @@ fn main() -> anyhow::Result<()> {
         Commands::Bench { quick, output_json } => {
             let config = if quick {
                 println!("Running quick benchmark (30-second local sanity check)...");
-                tptc_rs::bench::BenchConfig::quick()
+                tpt_gpu_compiler::bench::BenchConfig::quick()
             } else {
                 println!("Running full benchmark (5 minutes)...");
-                tptc_rs::bench::BenchConfig::default()
+                tpt_gpu_compiler::bench::BenchConfig::default()
             };
 
-            let mut runner = tptc_rs::bench::BenchRunner::new(config);
+            let mut runner = tpt_gpu_compiler::bench::BenchRunner::new(config);
 
             // Default kernel set for benchmarking
             let kernels: Vec<(String, String, Vec<i64>)> = vec![
@@ -147,18 +147,18 @@ fn main() -> anyhow::Result<()> {
 
             // Write JSON if requested
             if let Some(path) = output_json {
-                let json = tptc_rs::bench::report_to_json(&report);
+                let json = tpt_gpu_compiler::bench::report_to_json(&report);
                 std::fs::write(&path, &json)?;
                 println!("\nWrote structured JSON report to {}", path.display());
             } else {
                 // Also print JSON to stdout
                 println!("\n--- Structured JSON ---");
-                println!("{}", tptc_rs::bench::report_to_json(&report));
+                println!("{}", tpt_gpu_compiler::bench::report_to_json(&report));
             }
         }
 
         Commands::Version => {
-            println!("{}", tptc_rs::version());
+            println!("{}", tpt_gpu_compiler::version());
         }
     }
 
@@ -176,7 +176,7 @@ fn run_ai_generate(
 
     // --- Step 1: AI Generation ---
     println!("\n[1/4] AI generation...");
-    let provider = tpt_shared::provider_from_env();
+    let provider = tpt_gpu_shared::provider_from_env();
     println!("  provider: {}", provider.name());
     let tptir_text = generate_tptir_via_ai(provider.as_ref(), kernel, elem, shape)
         .map_err(|e| anyhow::anyhow!(e))?;
@@ -184,9 +184,9 @@ fn run_ai_generate(
 
     // --- Step 2: Parse and Validate ---
     println!("\n[2/4] Validation...");
-    let region = tptc_rs::ir::parse_assembly(&tptir_text)
+    let region = tpt_gpu_compiler::ir::parse_assembly(&tptir_text)
         .map_err(|e| anyhow::anyhow!("Parse error: {e}"))?;
-    let result = tptc_rs::validate::validate_region(&region);
+    let result = tpt_gpu_compiler::validate::validate_region(&region);
     if !result.is_valid() {
         anyhow::bail!("Validation failed with {} errors: {:?}", result.error_count(), result.errors);
     }
@@ -200,8 +200,8 @@ fn run_ai_generate(
     // --- Step 4: Benchmark ---
     if !no_bench {
         println!("\n[4/4] Benchmark...");
-        let config = tptc_rs::bench::BenchConfig::quick();
-        let mut runner = tptc_rs::bench::BenchRunner::new(config);
+        let config = tpt_gpu_compiler::bench::BenchConfig::quick();
+        let mut runner = tpt_gpu_compiler::bench::BenchRunner::new(config);
         let shape_params = parse_shape(shape)?;
         let result = runner.run_kernel(kernel, elem, &shape_params);
         println!("  {:.3} ms  {:.2} GFLOPS  {:.2} GB/s",
@@ -220,7 +220,7 @@ fn run_ai_generate(
 }
 
 fn generate_tptir_via_ai(
-    provider: &dyn tpt_shared::AiProvider,
+    provider: &dyn tpt_gpu_shared::AiProvider,
     kernel: &str,
     elem: &str,
     shape: &str,
@@ -244,7 +244,7 @@ fn generate_tptir_via_ai(
 }
 
 fn check_correctness(
-    region: &tptc_rs::ir::Region,
+    region: &tpt_gpu_compiler::ir::Region,
     kernel: &str,
     elem: &str,
 ) -> String {
@@ -258,7 +258,7 @@ fn check_correctness(
     }
 
     let has_return = region.blocks.iter().any(|b| {
-        b.operations.iter().any(|op| matches!(op.kind, tptc_rs::ir::OpKind::Return))
+        b.operations.iter().any(|op| matches!(op.kind, tpt_gpu_compiler::ir::OpKind::Return))
     });
 
     if has_return {
@@ -274,12 +274,12 @@ fn check_correctness(
 // Helpers
 // ---------------------------------------------------------------------------
 
-fn parse_elem(elem: &str) -> anyhow::Result<tptc_rs::ir::ElemType> {
+fn parse_elem(elem: &str) -> anyhow::Result<tpt_gpu_compiler::ir::ElemType> {
     match elem {
-        "f32"  => Ok(tptc_rs::ir::ElemType::F32),
-        "f16"  => Ok(tptc_rs::ir::ElemType::F16),
-        "bf16" => Ok(tptc_rs::ir::ElemType::BF16),
-        "i32"  => Ok(tptc_rs::ir::ElemType::I32),
+        "f32"  => Ok(tpt_gpu_compiler::ir::ElemType::F32),
+        "f16"  => Ok(tpt_gpu_compiler::ir::ElemType::F16),
+        "bf16" => Ok(tpt_gpu_compiler::ir::ElemType::BF16),
+        "i32"  => Ok(tpt_gpu_compiler::ir::ElemType::I32),
         _ => anyhow::bail!("Unknown element type: {}. Use f32, f16, bf16, or i32.", elem),
     }
 }

@@ -30,7 +30,7 @@ The Python API provides access to TPT GPU through PyO3 bindings, enabling rapid 
 
 ```bash
 cd layer4_tptr
-cargo build -p tptr-py
+cargo build -p tpt-gpu-runtime-py
 
 cd layer6_framework
 pip install -e ".[dev]"

@@ -799,14 +799,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8df9b6e13f2d32c91b9bd719c00d1958837bc7dec474d94952798cc8e69eeec3"
 
 [[package]]
-name = "tptb-cli"
+name = "tpt-gpu-script-cli"
 version = "1.0.0"
 dependencies = [
- "tptb-core",
+ "tpt-gpu-script-core",
 ]
 
 [[package]]
-name = "tptb-core"
+name = "tpt-gpu-script-core"
 version = "1.0.0"
 dependencies = [
  "serde",
@@ -815,21 +815,21 @@ dependencies = [
 ]
 
 [[package]]
-name = "tptb-format"
+name = "tpt-gpu-script-format"
 version = "1.0.0"
 dependencies = [
  "serde",
- "tptb-core",
+ "tpt-gpu-script-core",
 ]
 
 [[package]]
-name = "tptb-lsp"
+name = "tpt-gpu-script-lsp"
 version = "1.0.0"
 dependencies = [
  "dashmap",
  "tokio",
  "tower-lsp",
- "tptb-core",
+ "tpt-gpu-script-core",
  "tracing-subscriber",
 ]
 

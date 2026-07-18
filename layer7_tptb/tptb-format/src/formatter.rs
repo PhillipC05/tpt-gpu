@@ -1,14 +1,14 @@
-use tptb_core;
-use tptb_core::TokenKind;
+use tpt_gpu_script_core;
+use tpt_gpu_script_core::TokenKind;
 
-pub fn format_source(source: &str) -> Result<String, tptb_core::CompileError> {
-    let tokens = tptb_core::tokenize(source)?;
+pub fn format_source(source: &str) -> Result<String, tpt_gpu_script_core::CompileError> {
+    let tokens = tpt_gpu_script_core::tokenize(source)?;
     let mut formatter = Formatter::new(&tokens);
     Ok(formatter.format())
 }
 
 struct Formatter<'a> {
-    tokens: &'a [tptb_core::Token],
+    tokens: &'a [tpt_gpu_script_core::Token],
     pos: usize,
     output: String,
     indent_level: u32,
@@ -16,7 +16,7 @@ struct Formatter<'a> {
 }
 
 impl<'a> Formatter<'a> {
-    fn new(tokens: &'a [tptb_core::Token]) -> Self {
+    fn new(tokens: &'a [tpt_gpu_script_core::Token]) -> Self {
         Self { tokens, pos: 0, output: String::new(), indent_level: 0, indent_size: 4 }
     }
 
@@ -34,11 +34,11 @@ impl<'a> Formatter<'a> {
         self.output
     }
 
-    fn push_token(&mut self, token: &tptb_core::Token) { self.output.push_str(&token_text(token)); }
+    fn push_token(&mut self, token: &tpt_gpu_script_core::Token) { self.output.push_str(&token_text(token)); }
     fn push_str(&mut self, s: &str) { self.output.push_str(s); }
     fn indent_str(&mut self) { self.output.push_str(&" ".repeat((self.indent_level * self.indent_size) as usize)); }
     fn newline(&mut self) { self.output.push('\n'); self.indent_str(); }
-    fn current(&self) -> &tptb_core::Token { &self.tokens[self.pos] }
+    fn current(&self) -> &tpt_gpu_script_core::Token { &self.tokens[self.pos] }
     fn at_end(&self) -> bool { self.pos >= self.tokens.len() }
 
     fn format_fn_decl(&mut self) {
@@ -374,7 +374,7 @@ impl<'a> Formatter<'a> {
     }
 }
 
-fn token_text(token: &tptb_core::Token) -> String {
+fn token_text(token: &tpt_gpu_script_core::Token) -> String {
     match &token.kind {
         TokenKind::KwBreak => "break".into(),
         TokenKind::KwContinue => "continue".into(),

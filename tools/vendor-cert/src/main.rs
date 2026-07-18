@@ -16,7 +16,7 @@ mod report;
 
 /// TPT-GPU Vendor Certification CLI
 #[derive(Parser, Debug)]
-#[command(name = "tpt-vendor-cert", version, about = "TPT-GPU vendor certification test suite")]
+#[command(name = "tpt-gpu-vendor-cert", version, about = "TPT-GPU vendor certification test suite")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,

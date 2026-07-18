@@ -1,4 +1,4 @@
-﻿// tpt � TPT Script compiler CLI
+// tpt � TPT Script compiler CLI
 //
 // Usage:
 //   tpt new     <name>                  Create a new TPT Script project
@@ -19,7 +19,7 @@ use std::{
     process,
 };
 
-use tptb_core::{
+use tpt_gpu_script_core::{
     compile_full, compile_str,
 
     introspect, modules, DocFormat,
@@ -229,7 +229,7 @@ fn cmd_compat(args: &[String]) -> i32 {
     stub.push_str("import numpy as np\n\n");
 
     for item in &program.items {
-        if let tptb_core::ast::Item::Function(f) = &item {
+        if let tpt_gpu_script_core::ast::Item::Function(f) = &item {
             stub.push_str(&format!("def {}(", f.name));
             let params: Vec<String> = f.params.iter()
                 .map(|p| format!("{}: Any", p.name))
@@ -290,7 +290,7 @@ fn cmd_check(args: &[String]) -> i32 {
         eprintln!("warning: {issue}");
     }
 
-    let checker = tptb_core::type_check(&program);
+    let checker = tpt_gpu_script_core::type_check(&program);
     if checker.errors.is_empty() && unresolved.is_empty() {
         println!("{path}: ok � 0 errors");
         return 0;
@@ -335,7 +335,7 @@ fn cmd_compile(args: &[String]) -> i32 {
     let config = find_project_config(path);
 
     let (_checker, output) = match &config {
-        Some(cfg) => match tptb_core::compile_project(&source, cfg) {
+        Some(cfg) => match tpt_gpu_script_core::compile_project(&source, cfg) {
             Ok(result) => result,
             Err(e) => {
                 eprintln!("error: {e}");
@@ -523,7 +523,7 @@ fn print_help() {
     println!("    tpt docs attention");
 }
 
-fn print_error(err: &tptb_core::errors::TptError) {
+fn print_error(err: &tpt_gpu_script_core::errors::TptError) {
     eprintln!("error [{}]: {}", err.code, err.message);
     if let Some(fix) = &err.fix_code {
         eprintln!("  fix: {fix}");
@@ -667,7 +667,7 @@ fn add(a: f32, b: f32) -> f32 {
 }
 "#;
         let program = compile_str(source).expect("parse failed");
-        let checker = tptb_core::type_check(&program);
+        let checker = tpt_gpu_script_core::type_check(&program);
         assert!(checker.errors.is_empty(), "{:?}", checker.errors);
     }
 
@@ -679,7 +679,7 @@ fn f() -> f32 {
 }
 "#;
         let program = compile_str(source).expect("parse failed");
-        let checker = tptb_core::type_check(&program);
+        let checker = tpt_gpu_script_core::type_check(&program);
         assert!(!checker.errors.is_empty());
     }
 
@@ -706,7 +706,7 @@ import tpt.nn
 fn main() { }
 "#;
         let config = modules::ProjectConfig::new("test");
-        let (checker, output) = tptb_core::compile_project(source, &config)
+        let (checker, output) = tpt_gpu_script_core::compile_project(source, &config)
             .expect("compile_project failed");
         assert!(checker.errors.is_empty(), "{:?}", checker.errors);
         assert!(output.rust_source.contains("use tpt::nn"));
@@ -720,7 +720,7 @@ fn main() { }
 "#;
         let mut config = modules::ProjectConfig::new("test");
         config.features.insert("gpu".into());
-        let (_, output) = tptb_core::compile_project(source, &config)
+        let (_, output) = tpt_gpu_script_core::compile_project(source, &config)
             .expect("compile_project failed");
         assert!(output.rust_source.contains("use tpt::nn::layers::*"));
     }

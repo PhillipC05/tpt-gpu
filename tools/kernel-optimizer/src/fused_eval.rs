@@ -237,7 +237,7 @@ pub fn optimize_fused_problem(
 
     let final_result = if enable_ai {
         eprintln!("  [{}/{}] AI-guided refinement ({} iterations)...", 3, phases, ai_iterations);
-        let provider = tpt_shared::provider_from_env();
+        let provider = tpt_gpu_shared::provider_from_env();
         eprintln!("    provider: {}", provider.name());
         let r = crate::ai_guided_search(
             &space, &hc.params, &eval, provider.as_ref(),

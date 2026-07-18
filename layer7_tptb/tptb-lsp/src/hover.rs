@@ -1,5 +1,5 @@
 use tower_lsp::lsp_types::*;
-use tptb_core::TokenKind;
+use tpt_gpu_script_core::TokenKind;
 use crate::document::DocumentStore;
 
 pub fn provide_hover(doc: &DocumentStore, pos: Position) -> Option<Hover> {

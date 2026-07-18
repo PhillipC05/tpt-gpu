@@ -71,14 +71,14 @@ cd tpt-gpu
 
 # Build the TPT Script compiler (Layer 7)
 cd layer7_tptb
-cargo build --release -p tptb-cli
+cargo build --release -p tpt-gpu-script-cli
 
 # Build the runtime (Layer 4)
 cd ../layer4_tptr
-cargo build -p tptr-core
+cargo build -p tpt-gpu-runtime
 
 # Build Python bindings (optional)
-cargo build -p tptr-py
+cargo build -p tpt-gpu-runtime-py
 
 # Install Python framework (Layer 6)
 cd ../layer6_framework
@@ -89,7 +89,7 @@ pip install -e ".[dev]"
 
 ```bash
 # Check tpt CLI
-cargo run -p tptb-cli -- --help
+cargo run -p tpt-gpu-script-cli -- --help
 
 # Check Python bindings
 python -c "import tptr; print('TPT GPU loaded successfully')"

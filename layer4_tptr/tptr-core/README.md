@@ -1,10 +1,10 @@
-# tptr-core
+# tpt-gpu-runtime
 
 TPT Runtime — core allocator, scheduler, and kernel launch library for the TPT GPU stack.
 
 ## Overview
 
-`tptr-core` implements the fundamental GPU runtime services used across the TPT compute platform:
+`tpt-gpu-runtime` implements the fundamental GPU runtime services used across the TPT compute platform:
 
 - **Three-tier allocator** — Slab (fast path) → Buddy (medium) → Fallback (system)
 - **Priority queue scheduler** — with aging to prevent starvation
@@ -16,7 +16,7 @@ TPT Runtime — core allocator, scheduler, and kernel launch library for the TPT
 
 ```toml
 [dependencies]
-tptr-core = "0.1"
+tpt-gpu-runtime = "0.1"
 ```
 
 ## License

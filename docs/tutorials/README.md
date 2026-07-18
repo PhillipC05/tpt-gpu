@@ -51,8 +51,8 @@ All tutorials in order (17 hours)
 ## Build Commands
 
 ```bash
-cd layer7_tptb && cargo build --release -p tptb-cli
-cd layer4_tptr && cargo build -p tptr-core
+cd layer7_tptb && cargo build --release -p tpt-gpu-script-cli
+cd layer4_tptr && cargo build -p tpt-gpu-runtime
 cd layer6_framework && pip install -e ".[dev]"
 ```
 

@@ -102,7 +102,7 @@ cd layer2_driver/rust
 cargo build --release
 
 # Print device info
-./target/release/tptd-info /dev/dri/card0
+./target/release/tpt-gpu-driver-info /dev/dri/card0
 ```
 
 ### Rust API

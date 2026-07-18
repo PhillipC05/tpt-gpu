@@ -1,18 +1,18 @@
 [package]
-name = "tpt-model-registry"
+name = "tpt-gpu-model-registry"
 version = "0.1.0"
 edition = "2021"
 description = "Shared ~/.tpt/models/ registry for all TPT compute tools"
 license = "MIT OR Apache-2.0 WITH LLVM-exception"
 authors = ["TPT GPU Contributors"]
 repository = "https://github.com/tpt-solutions/tpt-gpu"
-documentation = "https://docs.rs/tpt-model-registry"
+documentation = "https://docs.rs/tpt-gpu-model-registry"
 readme = "README.md"
 keywords = ["gpu", "models", "gguf", "registry", "ml"]
 categories = ["command-line-utilities", "development-tools"]
 
 [[bin]]
-name = "tpt-models"
+name = "tpt-gpu-models"
 path = "src/main.rs"
 
 [dependencies]

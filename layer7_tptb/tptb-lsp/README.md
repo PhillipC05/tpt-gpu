@@ -16,7 +16,7 @@ tptb-lsp = "1.0"
 Or install the binary:
 
 ```sh
-cargo install tptb-lsp
+cargo install tpt-gpu-script-lsp
 ```
 
 ## License

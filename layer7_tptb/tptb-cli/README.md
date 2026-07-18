@@ -9,7 +9,7 @@ Command-line interface for the TPT Script compiler — the `tpt` binary.
 ## Installation
 
 ```sh
-cargo install tptb-cli
+cargo install tpt-gpu-script-cli
 ```
 
 ## Usage

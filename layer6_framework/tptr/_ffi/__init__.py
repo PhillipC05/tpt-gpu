@@ -15,7 +15,7 @@ _native_ext = None
 <<<<<<< Updated upstream
 
 # First, try to find the native extension in the target directory
-# The native extension is built by tptr-py in layer4_tptr
+# The native extension is built by tpt-gpu-runtime-py in layer4_tptr
 def _find_native_extension():
     """Find and load the native tptr extension module."""
     # Possible locations for the native extension
@@ -87,7 +87,7 @@ else:
     # Use a simple warning without stacklevel to avoid issues
     warnings.warn(
         "Native tptr extension not found. Using simulation fallback. "
-        "Build with: cd layer4_tptr && cargo build -p tptr-py",
+        "Build with: cd layer4_tptr && cargo build -p tpt-gpu-runtime-py",
         RuntimeWarning,
     )
     from ._sim import (

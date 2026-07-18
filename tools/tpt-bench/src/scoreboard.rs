@@ -173,7 +173,7 @@ pub fn render_scoreboard(scorecards: &[GpuScorecard], updated_at: &str) -> Strin
     if scorecards.is_empty() {
         out.push_str(
             "No results submitted yet.  \n\
-             Run `cargo run -p tpt-bench -- --contribute` on your machine to be the first!\n",
+             Run `cargo run -p tpt-gpu-bench -- --contribute` on your machine to be the first!\n",
         );
         return out;
     }
@@ -244,7 +244,7 @@ pub fn render_scoreboard(scorecards: &[GpuScorecard], updated_at: &str) -> Strin
     out.push('\n');
 
     out.push_str(
-        "> **Contribute your GPU:** run `cargo run -p tpt-bench -- --contribute` then open a PR \
+        "> **Contribute your GPU:** run `cargo run -p tpt-gpu-bench -- --contribute` then open a PR \
          adding `results/<gpu>-<ts>.json` — CI updates this table automatically.\n",
     );
 

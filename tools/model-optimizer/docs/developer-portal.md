@@ -23,7 +23,7 @@ For cloning the repo and general prerequisites, see the root [`README.md`](../..
 ```bash
 cd tpt-gpu
 
-# Install the model-optimizer CLI
+# Install the tpt-gpu-model-optimizer CLI
 cargo install --path tools/model-optimizer
 ```
 
@@ -31,22 +31,22 @@ cargo install --path tools/model-optimizer
 
 ```bash
 # Profile your GPU hardware
-model-optimizer profile
+tpt-gpu-model-optimizer profile
 
 # Analyze domain-specific neuron distribution
-model-optimizer analyze model.gguf --output domain_map.json
+tpt-gpu-model-optimizer analyze model.gguf --output domain_map.json
 
 # Optimize a model with 5% max quality loss
-model-optimizer optimize model.gguf --max-loss 0.05 --output optimized.tptf
+tpt-gpu-model-optimizer optimize model.gguf --max-loss 0.05 --output optimized.tptf
 
 # Export to GGUF format for compatibility
-model-optimizer export optimized.tptf --format gguf --output model_fp16.gguf
+tpt-gpu-model-optimizer export optimized.tptf --format gguf --output model_fp16.gguf
 
 # Compare quality before/after optimization
-model-optimizer bench original.gguf optimized.tptf
+tpt-gpu-model-optimizer bench original.gguf optimized.tptf
 
 # Calculate max context window
-model-optimizer kv-calc optimized.tptf
+tpt-gpu-model-optimizer kv-calc optimized.tptf
 ```
 
 ## Model Optimizer Pipeline
@@ -125,7 +125,7 @@ The optimizer uses a "5% loss frontier" algorithm:
 Domains to prune are specified via `--domains-drop`:
 
 ```bash
-model-optimizer optimize model.gguf --domains-drop sql,typescript,sql --max-loss 0.05
+tpt-gpu-model-optimizer optimize model.gguf --domains-drop sql,typescript,sql --max-loss 0.05
 ```
 
 This zeros neurons associated with unwanted domains while preserving model integrity.

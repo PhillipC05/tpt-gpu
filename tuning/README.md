@@ -85,8 +85,8 @@ tuning/
 
 ```bash
 # Build and run the kernel optimizer
-cargo build --release -p tpt-tools
-./target/release/tpt-kernel-optimizer --gpu <model> --benchmark
+cargo build --release -p tpt-gpu-kernel-optimizer
+./target/release/tpt-gpu-kernel-optimizer --gpu <model> --benchmark
 ```
 
 ### 2. Collect Results
@@ -140,7 +140,7 @@ All profiles are validated against:
 Run validation:
 
 ```bash
-cargo test -p tptc --test tuning_validation
+cargo test -p tpt-gpu-compiler --test tuning_validation
 ```
 
 ## Using Tuning Profiles

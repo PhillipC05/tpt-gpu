@@ -29,9 +29,9 @@ The primary development direction flows **downward**: layer7 TPT Script compiles
 ```bash
 # Layer 4 — Runtime
 cd layer4_tptr
-cargo build -p tptr-core
-cargo test -p tptr-core
-cargo test -p tptr-core -- test_name    # Single test
+cargo build -p tpt-gpu-runtime
+cargo test -p tpt-gpu-runtime
+cargo test -p tpt-gpu-runtime -- test_name    # Single test
 
 # Layer 5 — Primitives
 cd layer5_tptp
@@ -40,9 +40,9 @@ cargo test
 
 # Layer 7 — TPT Script compiler
 cd layer7_tptb
-cargo build -p tptb-core
-cargo test -p tptb-core
-cargo test -p tptb-core -- test_name    # Single test
+cargo build -p tpt-gpu-script-core
+cargo test -p tpt-gpu-script-core
+cargo test -p tpt-gpu-script-core -- test_name    # Single test
 ```
 
 ### Layer 3 — TPTIR Compiler
@@ -150,14 +150,14 @@ Python bindings (`tptr-py`) wrap these via PyO3: `Device`, `Memory`, `Queue`, `K
 
 | Tool | Location | Description |
 |------|----------|-------------|
-| `tpt-bench` | `tools/tpt-bench/` | Benchmark harness for primitives and kernels |
-| `kernel-generator` | `tools/kernel-generator/` | AI-assisted kernel generation (spec → TPTIR → validate → bench) |
-| `kernel-optimizer` | `tools/kernel-optimizer/` | Auto-tuning: grid search → hill-climb → AI-guided |
-| `model-registry` | `tools/model-registry/` | Shared GGUF model registry (`~/.tpt/models/`); `ModelRegistry::open()`, HuggingFace download via `hf.rs` |
-| `tpt-playground` | `tools/tpt-playground/` | Interactive TPT Script playground |
-| `vendor-cert` | `tools/vendor-cert/` | Vendor certification harness |
+| `tpt-gpu-bench` | `tools/tpt-bench/` | Benchmark harness for primitives and kernels |
+| `tpt-gpu-kernelgen` | `tools/kernel-generator/` | AI-assisted kernel generation (spec → TPTIR → validate → bench) |
+| `tpt-gpu-kernel-optimizer` | `tools/kernel-optimizer/` | Auto-tuning: grid search → hill-climb → AI-guided |
+| `tpt-gpu-model-registry` | `tools/model-registry/` | Shared GGUF model registry (`~/.tpt/models/`); `ModelRegistry::open()`, HuggingFace download via `hf.rs` |
+| `tpt-gpu-playground` | `tools/tpt-playground/` | Interactive TPT Script playground |
+| `tpt-gpu-vendor-cert` | `tools/vendor-cert/` | Vendor certification harness |
 
-The `model-registry` crate is shared across tpt-gpu, tpt-spark, and tpt-crucible. Models are downloaded once to `~/.tpt/models/` and never duplicated. See `MODELS_REGISTRY.md` for the manifest format.
+The `tpt-gpu-model-registry` crate is shared across tpt-gpu, tpt-spark, and tpt-crucible. Models are downloaded once to `~/.tpt/models/` and never duplicated. See `MODELS_REGISTRY.md` for the manifest format.
 
 ---
 
@@ -165,7 +165,7 @@ The `model-registry` crate is shared across tpt-gpu, tpt-spark, and tpt-crucible
 
 | Crate | Location | Description |
 |-------|----------|-------------|
-| `tptir-spec` | `crates/tptir-spec/` | Machine-readable TPTIR operation specifications |
+| `tpt-gpu-ir-spec` | `crates/tptir-spec/` | Machine-readable TPTIR operation specifications |
 
 ---
 

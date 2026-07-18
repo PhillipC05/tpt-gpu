@@ -1,7 +1,7 @@
 //! Integration tests for TPT Primitives
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags, DType};
-use tptp_core::error::TptpErrorCode;
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags, DType};
+use tpt_gpu_primitives::error::TptpErrorCode;
 
 #[test] fn test_buffer_allocation() {
     let shape = Shape::dim2(64, 128);

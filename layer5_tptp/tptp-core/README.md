@@ -1,10 +1,10 @@
-# tptp-core
+# tpt-gpu-primitives
 
 TPT Primitives — TPTIR kernel wrappers and vendor library integration for the TPT GPU stack.
 
 ## Overview
 
-`tptp-core` provides the host-side Rust wrappers for GPU primitive kernels (GEMM, Attention, Conv2D) expressed in TPTIR. It routes dispatch to the available backend: CUDA, ROCm, Metal, or the pure TPTIR software path.
+`tpt-gpu-primitives` provides the host-side Rust wrappers for GPU primitive kernels (GEMM, Attention, Conv2D) expressed in TPTIR. It routes dispatch to the available backend: CUDA, ROCm, Metal, or the pure TPTIR software path.
 
 ## Features
 
@@ -18,7 +18,7 @@ TPT Primitives — TPTIR kernel wrappers and vendor library integration for the 
 
 ```toml
 [dependencies]
-tptp-core = "1.0"
+tpt-gpu-primitives = "1.0"
 ```
 
 ## License

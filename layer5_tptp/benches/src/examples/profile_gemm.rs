@@ -7,9 +7,9 @@
 
 use clap::Parser;
 
-use tptp_benches::harness::{BenchConfig, BenchHarness};
-use tptp_benches::kernels::GemmBench;
-use tptp_benches::stats::{compute_statistics, remove_outliers};
+use tpt_gpu_primitives_benches::harness::{BenchConfig, BenchHarness};
+use tpt_gpu_primitives_benches::kernels::GemmBench;
+use tpt_gpu_primitives_benches::stats::{compute_statistics, remove_outliers};
 
 #[derive(Parser)]
 #[command(name = "profile-gemm", about = "Profile a single GEMM problem size")]

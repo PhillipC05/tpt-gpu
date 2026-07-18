@@ -9,7 +9,7 @@ TPT GPU userspace daemon — context management and VRAM isolation for the TPT G
 ## Running
 
 ```sh
-cargo install tptd-daemon
+cargo install tpt-gpu-driver-daemon
 tptd  # starts the daemon; listens on /var/run/tptd.sock by default
 ```
 

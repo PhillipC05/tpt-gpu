@@ -90,18 +90,18 @@ let result = FusedGemmKernel::new(FusedActivation::Gelu)
 
 ```bash
 # Run with default settings (transformer size)
-cargo run -p tptp-benches --example fused_gemm_benchmark
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark
 
 # Run with specific problem size
-cargo run -p tptp-benches --example fused_gemm_benchmark -- --size llm
-cargo run -p tptp-benches --example fused_gemm_benchmark -- --size bert
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark -- --size llm
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark -- --size bert
 
 # Run with bias
-cargo run -p tptp-benches --example fused_gemm_benchmark -- --with-bias
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark -- --with-bias
 
 # Run with different activation
-cargo run -p tptp-benches --example fused_gemm_benchmark -- --activation gelu
-cargo run -p tptp-benches --example fused_gemm_benchmark -- --activation silu
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark -- --activation gelu
+cargo run -p tpt-gpu-primitives-benches --example fused_gemm_benchmark -- --activation silu
 ```
 
 ## AI-Guided Optimization Details

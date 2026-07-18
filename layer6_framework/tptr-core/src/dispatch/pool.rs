@@ -1,6 +1,6 @@
 //! Memory Pool - Efficient reuse of GPU allocations for framework integration.
-use tptr_core::memory::{MemoryAllocation, MemoryRegion, MemType, MemAccess, Alignment};
-use tptr_core::error::{TptrResult, TptrError, ErrorCode};
+use tpt_gpu_runtime::memory::{MemoryAllocation, MemoryRegion, MemType, MemAccess, Alignment};
+use tpt_gpu_runtime::error::{TptrResult, TptrError, ErrorCode};
 use std::collections::VecDeque;
 use std::sync::atomic::{AtomicU64, Ordering};
 

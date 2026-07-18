@@ -362,7 +362,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "tptd-daemon"
+name = "tpt-gpu-driver-daemon"
 version = "0.1.0"
 dependencies = [
  "anyhow",

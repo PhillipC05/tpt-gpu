@@ -4,8 +4,8 @@
 //! Problem sizes: various (seq_len, d_k) combinations.
 
 use crate::harness::KernelBench;
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags, DType};
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags, DType};
 use std::time::Instant;
 
 pub struct AttentionBench {
@@ -68,7 +68,7 @@ impl KernelBench for AttentionBench {
         let v = GpuBuffer::<f32>::new(Shape::dim2(seq_len, d_k), DType::F32, BufferFlags::STORAGE)?;
 
         let t0 = Instant::now();
-        let kernel = tptp_core::AttentionKernel::new();
+        let kernel = tpt_gpu_primitives::AttentionKernel::new();
         let _ = kernel.execute(&q, &k, &v, None, None)?;
         let elapsed_ms = t0.elapsed().as_secs_f64() * 1000.0;
 

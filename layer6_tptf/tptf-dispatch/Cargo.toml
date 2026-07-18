@@ -1,5 +1,5 @@
 [package]
-name = "tptf-dispatch"
+name = "tpt-gpu-dispatch"
 version = "0.1.0"
 edition = "2021"
 description = "Performance-critical dispatch paths for TPT framework backends"
@@ -13,11 +13,11 @@ crate-type = ["cdylib"]
 [dependencies]
 pyo3 = { version = "0.22", features = ["extension-module"] }
 numpy = "0.22"
-tptr-core = { path = "../../layer4_tptr/tptr-core", optional = true }
+tpt-gpu-runtime = { path = "../../layer4_tptr/tptr-core", optional = true }
 
 [features]
 # Build with hardware runtime support
-hardware = ["tptr-core"]
+hardware = ["tpt-gpu-runtime"]
 # Simulation mode (default): pure Rust fallback, no tptr dependency
 default = []
 

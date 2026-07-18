@@ -414,7 +414,7 @@ pub fn ai_guided_search(
     space: &ParamSpace,
     initial: &TuningParams,
     eval: &dyn KernelEvaluator,
-    provider: &dyn tpt_shared::AiProvider,
+    provider: &dyn tpt_gpu_shared::AiProvider,
     kernel_name: &str,
     iterations: usize,
 ) -> OptResult {

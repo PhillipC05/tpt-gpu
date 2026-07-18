@@ -1,17 +1,17 @@
-# TPT AI — Multi-Provider AI Abstraction
+# TPT AI ï¿½ Multi-Provider AI Abstraction
 
 A unified Rust library for LLM inference across multiple backends: **Claude** (Anthropic), **OpenRouter**, and **Ollama**.
 
 ## Features
 
-- ?? **Single `AiProvider` trait** — Switch providers with zero code changes
-- ?? **Three providers** — Claude, OpenRouter (100+ models), and local Ollama
-- ?? **Factory pattern** — Create providers from config or environment variables
-- ?? **Type-safe requests/responses** — Structured messages, model configs, and usage stats
-- ?? **Multi-turn conversations** — Support for system prompts and conversation history
-- ?? **Token tracking** — Automatic usage counting and reporting
-- ? **Async-ready** — Providers are `Send + Sync` for multi-threaded contexts
-- ??? **Error handling** — Comprehensive error types with retry guidance
+- ?? **Single `AiProvider` trait** ï¿½ Switch providers with zero code changes
+- ?? **Three providers** ï¿½ Claude, OpenRouter (100+ models), and local Ollama
+- ?? **Factory pattern** ï¿½ Create providers from config or environment variables
+- ?? **Type-safe requests/responses** ï¿½ Structured messages, model configs, and usage stats
+- ?? **Multi-turn conversations** ï¿½ Support for system prompts and conversation history
+- ?? **Token tracking** ï¿½ Automatic usage counting and reporting
+- ? **Async-ready** ï¿½ Providers are `Send + Sync` for multi-threaded contexts
+- ??? **Error handling** ï¿½ Comprehensive error types with retry guidance
 
 ## Quick Start
 
@@ -71,7 +71,7 @@ let provider = ClaudeProvider::new("sk-ant-...")
 ```
 
 **Environment Variables:**
-- `ANTHROPIC_API_KEY` — Your Anthropic API key
+- `ANTHROPIC_API_KEY` ï¿½ Your Anthropic API key
 
 **Default Model:** `claude-sonnet-4-20250514`
 
@@ -87,7 +87,7 @@ let provider = OpenRouterProvider::from_env()?;
 ```
 
 **Environment Variables:**
-- `OPENROUTER_API_KEY` — Your OpenRouter API key
+- `OPENROUTER_API_KEY` ï¿½ Your OpenRouter API key
 
 **Default Model:** `google/gemini-2.0-flash-001`
 
@@ -241,28 +241,28 @@ println!("{}", text);
 
 This library is designed to support GPU kernel generation workflows:
 
-1. **Kernel Generation** — Generate optimized CUDA/ROCm/Metal kernels
-2. **Performance Hints** — Get optimization suggestions for specific hardware
-3. **Natural Language Queries** — Ask questions about GPU programming concepts
-4. **Multi-Provider Fallback** — Switch between providers based on availability
+1. **Kernel Generation** ï¿½ Generate optimized CUDA/ROCm/Metal kernels
+2. **Performance Hints** ï¿½ Get optimization suggestions for specific hardware
+3. **Natural Language Queries** ï¿½ Ask questions about GPU programming concepts
+4. **Multi-Provider Fallback** ï¿½ Switch between providers based on availability
 
 ## Architecture
 
 ```
 +---------------------------------------------+
-¦              Your Application               ¦
+ï¿½              Your Application               ï¿½
 +---------------------------------------------+
-                     ¦
+                     ï¿½
                      ?
 +---------------------------------------------+
-¦          AiProvider Trait (unified)         ¦
+ï¿½          AiProvider Trait (unified)         ï¿½
 +---------------------------------------------+
-                     ¦
+                     ï¿½
         +------------+------------+
         ?            ?            ?
    +---------+ +----------+ +---------+
-   ¦ Claude  ¦ ¦OpenRouter¦ ¦ Ollama  ¦
-   ¦Provider ¦ ¦ Provider ¦ ¦Provider ¦
+   ï¿½ Claude  ï¿½ ï¿½OpenRouterï¿½ ï¿½ Ollama  ï¿½
+   ï¿½Provider ï¿½ ï¿½ Provider ï¿½ ï¿½Provider ï¿½
    +---------+ +----------+ +---------+
 ```
 
@@ -270,10 +270,10 @@ This library is designed to support GPU kernel generation workflows:
 
 ```bash
 # Run all tests
-cargo test -p tpt-ai
+cargo test -p tpt-gpu-shared
 
 # Run with output
-cargo test -p tpt-ai -- --nocapture
+cargo test -p tpt-gpu-shared -- --nocapture
 ```
 
 ## License

@@ -29,7 +29,7 @@ cargo run --bin tpt-models -- remove <name>
 ## Using it from code
 
 ```rust
-use tpt_model_registry::ModelRegistry;
+use tpt_gpu_model_registry::ModelRegistry;
 
 let mut registry = ModelRegistry::open()?;
 ```

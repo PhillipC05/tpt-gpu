@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
 use std::path::PathBuf;
-use tpt_shared::AiProvider;
+use tpt_gpu_shared::AiProvider;
 
 /// A single calibration prompt with an expected response for scoring.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -60,7 +60,7 @@ impl CalibrationGenerator {
 
     /// Set an AI provider from environment variables (claude, openrouter, or ollama)
     pub fn with_provider_from_env(self) -> Self {
-        match tpt_shared::provider_from_env() {
+        match tpt_gpu_shared::provider_from_env() {
             p => self.with_provider(p),
         }
     }

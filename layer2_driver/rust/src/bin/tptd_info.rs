@@ -1,8 +1,8 @@
-// tptd-info — print device information for a TPT GPU
+// tpt-gpu-driver-info — print device information for a TPT GPU
 //
-// Usage: tptd-info [/dev/dri/card0]
+// Usage: tpt-gpu-driver-info [/dev/dri/card0]
 
-use tptd::{Device, QueryType};
+use tpt_gpu_driver::{Device, QueryType};
 
 fn main() {
     let path = std::env::args().nth(1)

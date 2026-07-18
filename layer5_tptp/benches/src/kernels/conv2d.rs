@@ -4,8 +4,8 @@
 //! Problem sizes: various (H, W, C_in, C_out, K) combinations.
 
 use crate::harness::KernelBench;
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags, DType};
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags, DType};
 use std::time::Instant;
 
 pub struct Conv2DBench {
@@ -92,7 +92,7 @@ impl KernelBench for Conv2DBench {
         )?;
 
         let t0 = Instant::now();
-        let kernel = tptp_core::Conv2DKernel::new();
+        let kernel = tpt_gpu_primitives::Conv2DKernel::new();
         let _ = kernel.execute(&input, &filter, [1, 1], [0, 0], None)?;
         let elapsed_ms = t0.elapsed().as_secs_f64() * 1000.0;
 

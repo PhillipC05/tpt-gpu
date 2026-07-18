@@ -16,11 +16,11 @@ use std::io;
 use std::path::{Path, PathBuf};
 use std::sync::{Arc, Mutex};
 
-use tptp_core::{
+use tpt_gpu_primitives::{
     AttentionKernel, EmbeddingKernel, GemmKernel, GpuBuffer, RmsNormKernel,
     SoftmaxKernel, VendorBackend,
 };
-use tptp_core::memory::{BufferFlags, DType, Shape};
+use tpt_gpu_primitives::memory::{BufferFlags, DType, Shape};
 
 use crate::arch::{ArchTemplate, ForwardOp, template_for_arch};
 use crate::error::{ErrorCode, TptrError, TptrResult};

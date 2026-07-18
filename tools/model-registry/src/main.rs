@@ -1,9 +1,9 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use tpt_model_registry::ModelRegistry;
+use tpt_gpu_model_registry::ModelRegistry;
 
 #[derive(Parser)]
-#[command(name = "tpt-models", about = "Manage the ~/.tpt/models/ shared model registry")]
+#[command(name = "tpt-gpu-models", about = "Manage the ~/.tpt/models/ shared model registry")]
 struct Cli {
     #[command(subcommand)]
     cmd: Cmd,
@@ -27,7 +27,7 @@ fn main() -> Result<()> {
         Cmd::List => {
             let models = registry.models();
             if models.is_empty() {
-                println!("No models registered. Run `tpt-models` --help for usage.");
+                println!("No models registered. Run `tpt-gpu-models` --help for usage.");
             } else {
                 println!("{:<30} {:<10} {:<8} {}", "NAME", "ARCH", "SIZE_GB", "FILE");
                 for m in models {

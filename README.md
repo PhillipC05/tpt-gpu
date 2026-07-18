@@ -34,9 +34,9 @@ cd tpt-gpu
 
 # Build the TPT Script compiler
 cd layer7_tptb
-cargo build --release -p tptb-cli
+cargo build --release -p tpt-gpu-script-cli
 
-# The binary is at: target/release/tpt
+# The binary is at: target/release/tpt-gpu-script
 ```
 
 ### Your First TPT Script
@@ -88,9 +88,9 @@ cargo build --release
 
 # Build specific components
 cd layer7_tptb
-cargo build --release -p tptb-cli      # CLI tool
-cargo build --release -p tptb-lsp      # LSP server
-cargo build --release -p tptb-format   # Formatter/linter
+cargo build --release -p tpt-gpu-script-cli      # CLI tool
+cargo build --release -p tpt-gpu-script-lsp      # LSP server
+cargo build --release -p tpt-gpu-script-format   # Formatter/linter
 
 # Run tests
 cargo test --workspace
@@ -160,10 +160,10 @@ layer7_tptb/     TPT Script compiler — lexer → parser → type checker → c
 
 | Tool | Description | Command |
 |------|-------------|---------|
-| `tpt` | CLI compiler | `tpt check`, `tpt compile`, `tpt run` |
-| `tptb-lsp` | Language Server | IDE integration |
-| `tptb-format` | Formatter/Linter | `tptb-format fmt`, `tptb-format lint` |
-| `model-registry` | Shared GGUF model registry | `tpt-model-registry add/list/fetch` |
+| `tpt-gpu-script` | CLI compiler | `tpt-gpu-script check`, `tpt-gpu-script compile`, `tpt-gpu-script run` |
+| `tpt-gpu-lsp` | Language Server | IDE integration |
+| `tpt-gpu-fmt` | Formatter/Linter | `tpt-gpu-fmt fmt`, `tpt-gpu-fmt lint` |
+| `model-registry` | Shared GGUF model registry | `tpt-gpu-models add/list/fetch` |
 | `kernel-generator` | AI-assisted kernel gen | Spec → TPTIR → validate → benchmark |
 | `kernel-optimizer` | Auto-tuning | Grid → hill-climb → AI-guided search |
 
@@ -175,9 +175,9 @@ TPT GPU components are published to crates.io for easy integration:
 
 ```toml
 [dependencies]
-tptb-core = "1.0"    # TPT Script compiler
-tptp-core = "1.0"    # GPU primitives
-tptr-core = "1.0"    # Runtime
+tpt-gpu-script-core = "1.0"    # TPT Script compiler
+tpt-gpu-primitives = "1.0"     # GPU primitives
+tpt-gpu-runtime = "1.0"        # Runtime
 ```
 
 Publish commands:

@@ -1,9 +1,9 @@
-use tptb_lsp::TptLspService;
+use tpt_gpu_script_lsp::TptLspService;
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt()
-        .with_env_filter("tptb_lsp=info")
+        .with_env_filter("tpt_gpu_script_lsp=info")
         .with_writer(std::io::stderr)
         .init();
 

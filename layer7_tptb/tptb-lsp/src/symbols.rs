@@ -1,5 +1,5 @@
 use tower_lsp::lsp_types::*;
-use tptb_core;
+use tpt_gpu_script_core;
 use crate::document::DocumentStore;
 
 pub fn provide_symbols(doc: &DocumentStore) -> Option<DocumentSymbolResponse> {
@@ -7,7 +7,7 @@ pub fn provide_symbols(doc: &DocumentStore) -> Option<DocumentSymbolResponse> {
     let mut symbols = Vec::new();
     for item in &program.items {
         match item {
-            tptb_core::ast::Item::Function(func) => {
+            tpt_gpu_script_core::ast::Item::Function(func) => {
                 let start = Position { line: func.span.line - 1, character: func.span.col - 1 };
                 let end_line = func.body.span.line - 1;
                 let end_col = func.body.span.col;
@@ -26,7 +26,7 @@ pub fn provide_symbols(doc: &DocumentStore) -> Option<DocumentSymbolResponse> {
                     },
                 });
             }
-            tptb_core::ast::Item::TypeAlias(ty) => {
+            tpt_gpu_script_core::ast::Item::TypeAlias(ty) => {
                 let start = Position { line: ty.span.line - 1, character: ty.span.col - 1 };
                 symbols.push(SymbolInformation {
                     name: ty.name.clone(),
@@ -43,7 +43,7 @@ pub fn provide_symbols(doc: &DocumentStore) -> Option<DocumentSymbolResponse> {
                     },
                 });
             }
-            tptb_core::ast::Item::Import(imp) => {
+            tpt_gpu_script_core::ast::Item::Import(imp) => {
                 let path = imp.path.join("::");
                 let start = Position { line: imp.span.line - 1, character: imp.span.col - 1 };
                 symbols.push(SymbolInformation {

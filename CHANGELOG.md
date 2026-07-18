@@ -146,7 +146,7 @@ This is the first production-ready release of TPT GPU. It includes:
 If you were using the beta version:
 
 1. Update your TPT Script files (no breaking changes expected)
-2. Rebuild the compiler: `cargo build --release -p tptb-cli`
+2. Rebuild the compiler: `cargo build --release -p tpt-gpu-script-cli`
 3. Update VS Code extension (if installed)
 4. Review new features in the user guide
 

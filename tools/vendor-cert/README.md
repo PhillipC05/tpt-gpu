@@ -1,6 +1,6 @@
 # TPT-GPU Vendor Certification Tool
 
-The `tpt-vendor-cert` tool provides automated certification testing for third-party hardware vendor backends in the TPT-GPU ecosystem.
+The `tpt-gpu-vendor-cert` tool provides automated certification testing for third-party hardware vendor backends in the TPT-GPU ecosystem.
 
 ## Overview
 

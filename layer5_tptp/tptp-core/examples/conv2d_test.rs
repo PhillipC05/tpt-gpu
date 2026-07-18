@@ -2,8 +2,8 @@
 //!
 //! Demonstrates how to use the Conv2D kernel wrapper.
 
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags};
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags};
 
 fn main() {
     println!("TPT Conv2D Kernel Example");

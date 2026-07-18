@@ -1,4 +1,4 @@
-# tptb-core
+# tpt-gpu-script-core
 
 TPT Script compiler frontend — lexer, AST, and parser.
 

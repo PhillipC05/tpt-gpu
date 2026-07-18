@@ -1,10 +1,10 @@
-# tptr-dispatch
+# tpt-gpu-framework-dispatch
 
 Performance-critical Rust dispatch paths for TPT framework backends (PyTorch, JAX).
 
 ## Overview
 
-`tptr-dispatch` provides the hot-path Rust functions that the Python framework layers call via FFI. It routes tensor operations to `tptr-core` when hardware is available, or falls back to a pure-Rust simulation path.
+`tpt-gpu-framework-dispatch` provides the hot-path Rust functions that the Python framework layers call via FFI. It routes tensor operations to `tpt-gpu-runtime` when hardware is available, or falls back to a pure-Rust simulation path.
 
 ## Features
 

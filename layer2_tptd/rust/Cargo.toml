@@ -1,7 +1,7 @@
 [workspace]
 
 [package]
-name    = "tptd-daemon"
+name    = "tpt-gpu-driver-daemon"
 version = "0.1.0"
 edition = "2021"
 description = "TPT GPU userspace daemon — context management and VRAM isolation"
@@ -13,11 +13,11 @@ keywords = ["gpu", "daemon", "driver", "vram", "compute"]
 categories = ["hardware-support", "os::linux-apis"]
 
 [[bin]]
-name = "tptd"
+name = "tpt-gpu-daemon"
 path = "src/main.rs"
 
 [lib]
-name = "tptd_lib"
+name = "tpt_gpu_driver_daemon"
 path = "src/lib.rs"
 
 [dependencies]

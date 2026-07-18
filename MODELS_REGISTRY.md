@@ -56,7 +56,7 @@ On Windows the home directory is `%USERPROFILE%`, so the full path is
 
 ### tpt-gpu (this repo)
 
-- Provides the `tpt-model-registry` crate (`tools/model-registry/`) with:
+- Provides the `tpt-gpu-model-registry` crate (`tools/model-registry/`) with:
   - `ModelRegistry::open()` — loads or creates `~/.tpt/models/models.json`
   - `ModelRegistry::register()` — adds or updates a model entry
   - `ModelRegistry::find_by_name()` — looks up a model

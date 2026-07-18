@@ -1,22 +1,22 @@
 [package]
-name        = "tptd"
+name        = "tpt-gpu-driver"
 version     = "0.1.0"
 edition     = "2021"
 authors     = ["TPT GPU Contributors"]
 description = "TPT GPU userspace driver library"
 license     = "MIT OR Apache-2.0 WITH LLVM-exception"
 repository  = "https://github.com/tpt-solutions/tpt-gpu"
-documentation = "https://docs.rs/tptd"
+documentation = "https://docs.rs/tpt-gpu-driver"
 readme      = "README.md"
 keywords    = ["gpu", "driver", "ffi", "hardware", "compute"]
 categories  = ["hardware-support", "os::linux-apis"]
 
 [lib]
-name    = "tptd"
+name    = "tpt_gpu_driver"
 crate-type = ["cdylib", "rlib"]   # rlib for Rust consumers; cdylib for C FFI
 
 [[bin]]
-name = "tptd-info"
+name = "tpt-gpu-driver-info"
 path = "src/bin/tptd_info.rs"
 
 [dependencies]

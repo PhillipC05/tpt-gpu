@@ -51,7 +51,7 @@ struct OpEstimate {
 /// - `perf_estimate`  — simulated performance breakdown
 #[wasm_bindgen]
 pub fn compile(source: &str) -> String {
-    let result = match tptb_core::compile_full(source) {
+    let result = match tpt_gpu_script_core::compile_full(source) {
         Ok((checker, output)) => {
             let errors: Vec<ErrorInfo> = checker
                 .errors

@@ -81,14 +81,14 @@ layer4_tptr/
 #### Core library
 ```bash
 cd layer4_tptr
-cargo build -p tptr-core
-cargo test -p tptr-core
+cargo build -p tpt-gpu-runtime
+cargo test -p tpt-gpu-runtime
 ```
 
 #### Python bindings
 ```bash
 cd layer4_tptr
-cargo build -p tptr-py
+cargo build -p tpt-gpu-runtime-py
 ```
 
 ### Usage (Python)

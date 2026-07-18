@@ -1,5 +1,5 @@
 use tower_lsp::lsp_types::*;
-use tptb_core::TokenKind;
+use tpt_gpu_script_core::TokenKind;
 
 /// A database of completable items extracted from the current document.
 pub struct CompletionDatabase {
@@ -10,7 +10,7 @@ pub struct CompletionDatabase {
 }
 
 impl CompletionDatabase {
-    pub fn from_tokens(tokens: &[tptb_core::Token]) -> Self {
+    pub fn from_tokens(tokens: &[tpt_gpu_script_core::Token]) -> Self {
         let mut identifiers = Vec::new();
         for token in tokens {
             if let TokenKind::Ident(name) = &token.kind {
@@ -144,7 +144,7 @@ fn position_to_offset(source: &str, pos: Position) -> usize {
     source.len()
 }
 
-fn find_prev_token(tokens: &[tptb_core::Token], offset: usize) -> Option<&tptb_core::Token> {
+fn find_prev_token(tokens: &[tpt_gpu_script_core::Token], offset: usize) -> Option<&tpt_gpu_script_core::Token> {
     tokens.iter()
         .filter(|t| t.span.end <= offset)
         .max_by_key(|t| t.span.end)

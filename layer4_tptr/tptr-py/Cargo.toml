@@ -1,5 +1,5 @@
 [package]
-name = "tptr-py"
+name = "tpt-gpu-runtime-py"
 version = "0.1.0"
 edition = "2021"
 description = "TPT Runtime - Python bindings via PyO3"
@@ -11,5 +11,5 @@ crate-type = ["cdylib"]
 name = "tptr"
 
 [dependencies]
-tptr-core = { path = "../tptr-core" }
+tpt-gpu-runtime = { path = "../tptr-core" }
 pyo3 = { version = "0.24", features = ["extension-module"] }

@@ -49,9 +49,9 @@ This document tracks the completion of all tasks for the TPT Script v1.0.0 publi
 ## 📦 Pre-Publication Steps
 
 ### Testing (Optional but Recommended)
-1. Run full test suite: `cargo test -p tptb-core`
-2. Test CLI functionality: `cargo run -p tptb-cli -- check examples/01_hello_tensor.tpts`
-3. Verify documentation: `cargo doc --no-deps -p tptb-core`
+1. Run full test suite: `cargo test -p tpt-gpu-script-core`
+2. Test CLI functionality: `cargo run -p tpt-gpu-script-cli -- check examples/01_hello_tensor.tpts`
+3. Verify documentation: `cargo doc --no-deps -p tpt-gpu-script-core`
 
 ### Crates.io Publication
 1. Create crates.io account and get API token

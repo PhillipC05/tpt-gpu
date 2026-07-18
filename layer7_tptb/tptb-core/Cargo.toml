@@ -1,12 +1,12 @@
 [package]
-name = "tptb-core"
+name = "tpt-gpu-script-core"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
 description = "TPT Script compiler frontend -- lexer, AST, and parser"
 license.workspace = true
 repository.workspace = true
-documentation = "https://docs.rs/tptb-core"
+documentation = "https://docs.rs/tpt-gpu-script-core"
 readme = "README.md"
 keywords.workspace = true
 categories.workspace = true

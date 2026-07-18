@@ -1,5 +1,5 @@
 use tower_lsp::lsp_types::*;
-use tptb_core;
+use tpt_gpu_script_core;
 
 use crate::document::DocumentStore;
 
@@ -23,7 +23,7 @@ pub fn goto_definition(
 
     // Search for a matching function definition
     for item in &program.items {
-        if let tptb_core::ast::Item::Function(func) = item {
+        if let tpt_gpu_script_core::ast::Item::Function(func) = item {
             if func.name == name {
                 return Some(GotoDefinitionResponse::Scalar(Location {
                     uri: doc.uri.clone(),
@@ -34,7 +34,7 @@ pub fn goto_definition(
                 }));
             }
         }
-        if let tptb_core::ast::Item::TypeAlias(ty) = item {
+        if let tpt_gpu_script_core::ast::Item::TypeAlias(ty) = item {
             if ty.name == name {
                 return Some(GotoDefinitionResponse::Scalar(Location {
                     uri: doc.uri.clone(),

@@ -1,7 +1,7 @@
 [workspace]
 
 [package]
-name = "tpt-vendor-cert"
+name = "tpt-gpu-vendor-cert"
 version = "0.1.0"
 edition = "2021"
 authors = ["TPT GPU Contributors"]
@@ -19,5 +19,5 @@ env_logger = "0.11"
 chrono = { version = "0.4", features = ["serde"] }
 
 [[bin]]
-name = "tpt-vendor-cert"
+name = "tpt-gpu-vendor-cert"
 path = "src/main.rs"

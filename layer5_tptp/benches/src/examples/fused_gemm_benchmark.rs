@@ -15,8 +15,8 @@
 //!   cargo run -p tptp-benches --example fused_gemm_benchmark -- --size llm
 
 use clap::Parser;
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags, DType};
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags, DType};
 
 #[derive(Parser)]
 #[command(name = "fused-gemm-benchmark", about = "Benchmark TPT Fused GEMM vs cuBLAS")]

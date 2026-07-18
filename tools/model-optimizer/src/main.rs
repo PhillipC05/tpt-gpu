@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::{Parser, Subcommand};
 use std::path::PathBuf;
 
-use tpt_model_optimizer::{
+use tpt_gpu_model_optimizer::{
     benchmark::QualityBenchmark,
     calibration::CalibrationGenerator,
     domain_mapper::DomainMapper,
@@ -104,7 +104,7 @@ fn cmd_analyze(model: PathBuf, domains: Option<Vec<String>>, output: Option<Path
     let ffn_dim = header.ffn_dim as usize;
     
     let domains = domains.unwrap_or_else(|| {
-        tpt_model_optimizer::domain_mapper::KNOWN_DOMAINS.iter().map(|s| s.to_string()).collect()
+        tpt_gpu_model_optimizer::domain_mapper::KNOWN_DOMAINS.iter().map(|s| s.to_string()).collect()
     });
     
     // Build domain map using real weights (via streaming for large models)
@@ -235,7 +235,7 @@ fn cmd_bench(before: PathBuf, after: PathBuf) -> Result<()> {
     let bench = QualityBenchmark::new(samples);
     let m_before = bench.evaluate(&before)?;
     let m_after  = bench.evaluate(&after)?;
-    let result = tpt_model_optimizer::benchmark::BenchmarkResult::compute(m_before, m_after, 0.05);
+    let result = tpt_gpu_model_optimizer::benchmark::BenchmarkResult::compute(m_before, m_after, 0.05);
     result.print_report();
     Ok(())
 }

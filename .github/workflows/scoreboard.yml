@@ -31,15 +31,15 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-tpt-bench-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-tpt-bench-
+          key: ${{ runner.os }}-cargo-tpt-gpu-bench-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-tpt-gpu-bench-
 
-      - name: Build tpt-bench
-        run: cargo build -p tpt-bench --release
+      - name: Build tpt-gpu-bench
+        run: cargo build -p tpt-gpu-bench --release
 
       - name: Update scoreboard
         run: |
-          cargo run -p tpt-bench --release -- \
+          cargo run -p tpt-gpu-bench --release -- \
             --scoreboard \
             --output results \
             --benchmarks-md BENCHMARKS.md \

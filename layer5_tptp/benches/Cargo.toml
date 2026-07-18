@@ -1,5 +1,5 @@
 [package]
-name = "tptp-benches"
+name = "tpt-gpu-primitives-benches"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
@@ -9,7 +9,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
-tptp-core = { path = "../tptp-core" }
+tpt-gpu-primitives = { path = "../tptp-core" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
@@ -20,8 +20,8 @@ rand = "0.8"
 
 [features]
 default = []
-cuda = ["tptp-core/cuda"]
-rocm = ["tptp-core/rocm"]
+cuda = ["tpt-gpu-primitives/cuda"]
+rocm = ["tpt-gpu-primitives/rocm"]
 all-baselines = ["cuda", "rocm"]
 
 [[example]]

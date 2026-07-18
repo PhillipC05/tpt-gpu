@@ -1,4 +1,4 @@
-# tptc-rs — Rust Port of TPTIR Compiler Stack
+# tpt-gpu-compiler — Rust Port of TPTIR Compiler Stack
 ## Build
 ```bash
 cd layer3_tptc/rust && cargo build && cargo test

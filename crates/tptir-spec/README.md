@@ -1,4 +1,4 @@
-# tptir-spec
+# tpt-gpu-ir-spec
 
 Machine-readable specification for the TPTIR compiler IR — operations, types, attributes, and the stable text-format serialization used across the TPT GPU stack.
 
@@ -10,13 +10,13 @@ TPTIR (TPT Intermediate Representation) is an SSA-based, MLIR-compatible IR used
 
 ```toml
 [dependencies]
-tptir-spec = "0.1"
+tpt-gpu-ir-spec = "0.1"
 ```
 
 Enable Serde support:
 
 ```toml
-tptir-spec = { version = "0.1", features = ["serde"] }
+tpt-gpu-ir-spec = { version = "0.1", features = ["serde"] }
 ```
 
 ## License

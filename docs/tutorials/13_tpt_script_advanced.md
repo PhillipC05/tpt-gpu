@@ -78,10 +78,10 @@ for op in ops {
 
 ```bash
 # Format a file
-cargo run -p tptb-format -- fmt file.tpts
+cargo run -p tpt-gpu-script-format -- fmt file.tpts
 
 # Lint a file
-cargo run -p tptb-format -- lint file.tpts
+cargo run -p tpt-gpu-script-format -- lint file.tpts
 ```
 
 ---

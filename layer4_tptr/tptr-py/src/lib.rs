@@ -2,7 +2,7 @@
 use pyo3::prelude::*;
 use pyo3::exceptions::{PyRuntimeError, PyValueError, PyMemoryError};
 use std::sync::Mutex;
-use tptr_core::{TptrError, ErrorCode, Device as CoreDevice, DeviceProperties, MemoryAllocation, MemoryRegion, MemType, MemAccess, Command, QueuePriority, Kernel, KernelConfig, KernelHandle, Dim3};
+use tpt_gpu_runtime::{TptrError, ErrorCode, Device as CoreDevice, DeviceProperties, MemoryAllocation, MemoryRegion, MemType, MemAccess, Command, QueuePriority, Kernel, KernelConfig, KernelHandle, Dim3};
 
 #[pymodule]
 fn tptr(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
@@ -86,7 +86,7 @@ impl PyMemoryAllocation {
 }
 
 #[pyclass(name = "CommandQueue")]
-pub struct PyQueue { handle: tptr_core::command::QueueHandle }
+pub struct PyQueue { handle: tpt_gpu_runtime::command::QueueHandle }
 #[pymethods] impl PyQueue { #[getter] fn handle(&self) -> u64 { self.handle.0 } }
 
 #[pyclass(name = "Kernel")]

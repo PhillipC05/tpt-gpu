@@ -78,9 +78,9 @@ jobs:
       with:
         name: release-${{ matrix.os }}
         path: |
-          target/release/tpt
-          target/release/tpt.exe
-          target/release/tptb-lsp
-          target/release/tptb-lsp.exe
-          target/release/tptb-format
-          target/release/tptb-format.exe
+          target/release/tpt-gpu-script
+          target/release/tpt-gpu-script.exe
+          target/release/tpt-gpu-lsp
+          target/release/tpt-gpu-lsp.exe
+          target/release/tpt-gpu-fmt
+          target/release/tpt-gpu-fmt.exe

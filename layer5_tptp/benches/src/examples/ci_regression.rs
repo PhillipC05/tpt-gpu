@@ -18,9 +18,9 @@ use std::fs;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
-use tptp_benches::harness::{BenchConfig, BenchHarness};
-use tptp_benches::kernels::{AttentionBench, Conv2DBench, GemmBench};
-use tptp_benches::report::{get_default_baselines, BenchReport};
+use tpt_gpu_primitives_benches::harness::{BenchConfig, BenchHarness};
+use tpt_gpu_primitives_benches::kernels::{AttentionBench, Conv2DBench, GemmBench};
+use tpt_gpu_primitives_benches::report::{get_default_baselines, BenchReport};
 
 /// CI regression detector — fails if any kernel's efficiency drops > threshold.
 #[derive(Parser)]

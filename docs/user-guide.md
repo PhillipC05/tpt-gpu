@@ -54,11 +54,11 @@ Beyond the `tpt` CLI, layer7 also builds an LSP server, formatter, and linter:
 
 ```bash
 cd layer7_tptb
-cargo build -p tptb-lsp      # LSP server (see §11 IDE Setup)
-cargo build -p tptb-format   # Formatter/linter (see §12)
+cargo build -p tpt-gpu-script-lsp      # LSP server (see §11 IDE Setup)
+cargo build -p tpt-gpu-script-format   # Formatter/linter (see §12)
 
-cargo run -p tptb-format -- fmt hello.tpts
-cargo run -p tptb-format -- lint hello.tpts
+cargo run -p tpt-gpu-script-format -- fmt hello.tpts
+cargo run -p tpt-gpu-script-format -- lint hello.tpts
 ```
 
 ### File Extension
@@ -453,14 +453,14 @@ npm run compile
 ### Using the Formatter
 
 ```bash
-cargo run -p tptb-format -- fmt input.tpts
-cargo run -p tptb-format -- fmt --in-place input.tpts
+cargo run -p tpt-gpu-script-format -- fmt input.tpts
+cargo run -p tpt-gpu-script-format -- fmt --in-place input.tpts
 ```
 
 ### Using the Linter
 
 ```bash
-cargo run -p tptb-format -- lint input.tpts
+cargo run -p tpt-gpu-script-format -- lint input.tpts
 ```
 
 ### Lint Rules

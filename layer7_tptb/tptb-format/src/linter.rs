@@ -1,4 +1,4 @@
-use tptb_core;
+use tpt_gpu_script_core;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -20,7 +20,7 @@ pub enum LintSeverity {
 
 pub fn lint_source(source: &str) -> Vec<LintWarning> {
     let mut warnings = Vec::new();
-    let tokens = match tptb_core::tokenize(source) {
+    let tokens = match tpt_gpu_script_core::tokenize(source) {
         Ok(t) => t,
         Err(_) => return warnings,
     };
@@ -33,11 +33,11 @@ pub fn lint_source(source: &str) -> Vec<LintWarning> {
     warnings
 }
 
-fn check_missing_doc(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
+fn check_missing_doc(tokens: &[tpt_gpu_script_core::Token]) -> Vec<LintWarning> {
     let mut warnings = Vec::new();
     for (i, token) in tokens.iter().enumerate() {
-        if matches!(token.kind, tptb_core::TokenKind::KwFn) {
-            let has_doc = tokens[..i].iter().any(|t| matches!(t.kind, tptb_core::TokenKind::At));
+        if matches!(token.kind, tpt_gpu_script_core::TokenKind::KwFn) {
+            let has_doc = tokens[..i].iter().any(|t| matches!(t.kind, tpt_gpu_script_core::TokenKind::At));
             if !has_doc {
                 warnings.push(LintWarning {
                     rule: "missing_doc".to_string(),
@@ -53,10 +53,10 @@ fn check_missing_doc(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
     warnings
 }
 
-fn check_naming_conventions(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
+fn check_naming_conventions(tokens: &[tpt_gpu_script_core::Token]) -> Vec<LintWarning> {
     let mut warnings = Vec::new();
     for token in tokens {
-        if let tptb_core::TokenKind::Ident(name) = &token.kind {
+        if let tpt_gpu_script_core::TokenKind::Ident(name) = &token.kind {
             if name.len() > 1 && name.chars().any(|c| c.is_uppercase()) {
                 if !is_pascal_case(name) && !is_known_tpt_name(name) {
                     warnings.push(LintWarning {
@@ -108,24 +108,24 @@ fn check_trailing_whitespace(source: &str) -> Vec<LintWarning> {
     warnings
 }
 
-fn check_missing_returns(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
+fn check_missing_returns(tokens: &[tpt_gpu_script_core::Token]) -> Vec<LintWarning> {
     let mut warnings = Vec::new();
     let mut i = 0;
     while i < tokens.len() {
-        if matches!(tokens[i].kind, tptb_core::TokenKind::KwFn) {
+        if matches!(tokens[i].kind, tpt_gpu_script_core::TokenKind::KwFn) {
             let mut j = i + 1;
-            while j < tokens.len() && !matches!(tokens[j].kind, tptb_core::TokenKind::Ident(_)) {
+            while j < tokens.len() && !matches!(tokens[j].kind, tpt_gpu_script_core::TokenKind::Ident(_)) {
                 j += 1;
             }
             if j >= tokens.len() { i += 1; continue; }
             let func_name = match &tokens[j].kind {
-                tptb_core::TokenKind::Ident(n) => n.clone(),
+                tpt_gpu_script_core::TokenKind::Ident(n) => n.clone(),
                 _ => { i += 1; continue; }
             };
             j += 1;
             let mut has_return_type = false;
-            while j < tokens.len() && !matches!(tokens[j].kind, tptb_core::TokenKind::LBrace) {
-                if matches!(tokens[j].kind, tptb_core::TokenKind::Arrow) {
+            while j < tokens.len() && !matches!(tokens[j].kind, tpt_gpu_script_core::TokenKind::LBrace) {
+                if matches!(tokens[j].kind, tpt_gpu_script_core::TokenKind::Arrow) {
                     has_return_type = true;
                     break;
                 }
@@ -136,12 +136,12 @@ fn check_missing_returns(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
                 let mut has_return = false;
                 while j < tokens.len() {
                     match tokens[j].kind {
-                        tptb_core::TokenKind::LBrace => brace_depth += 1,
-                        tptb_core::TokenKind::RBrace => {
+                        tpt_gpu_script_core::TokenKind::LBrace => brace_depth += 1,
+                        tpt_gpu_script_core::TokenKind::RBrace => {
                             brace_depth -= 1;
                             if brace_depth == 0 { break; }
                         }
-                        tptb_core::TokenKind::KwReturn => {
+                        tpt_gpu_script_core::TokenKind::KwReturn => {
                             if brace_depth > 0 { has_return = true; }
                         }
                         _ => {}
@@ -167,11 +167,11 @@ fn check_missing_returns(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
     warnings
 }
 
-fn check_unnecessary_semicolons(tokens: &[tptb_core::Token]) -> Vec<LintWarning> {
+fn check_unnecessary_semicolons(tokens: &[tpt_gpu_script_core::Token]) -> Vec<LintWarning> {
     let mut warnings = Vec::new();
     for i in 0..tokens.len().saturating_sub(1) {
-        if matches!(tokens[i].kind, tptb_core::TokenKind::RBrace)
-            && matches!(tokens[i + 1].kind, tptb_core::TokenKind::Semicolon)
+        if matches!(tokens[i].kind, tpt_gpu_script_core::TokenKind::RBrace)
+            && matches!(tokens[i + 1].kind, tpt_gpu_script_core::TokenKind::Semicolon)
         {
             warnings.push(LintWarning {
                 rule: "unnecessary_semicolon".to_string(),

@@ -1,7 +1,7 @@
 //! Dispatch Table - Operation dispatch for framework tensor operations.
-use tptr_core::error::{TptrResult, TptrError, ErrorCode};
-use tptr_core::memory::MemoryAllocation;
-use tptr_core::kernel::KernelConfig;
+use tpt_gpu_runtime::error::{TptrResult, TptrError, ErrorCode};
+use tpt_gpu_runtime::memory::MemoryAllocation;
+use tpt_gpu_runtime::kernel::KernelConfig;
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
 

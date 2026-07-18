@@ -2,7 +2,7 @@
 //!
 //! This example demonstrates how to use the multi-provider AI abstraction.
 
-use tpt_shared::{
+use tpt_gpu_shared::{
     AiProvider, AiRequest, AiMessage, Role,
     ClaudeProvider, OpenRouterProvider, OllamaProvider,
     ProviderFactory,
@@ -70,9 +70,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Example 6: Provider comparison
     println!("6. Provider comparison:");
-    println!("   Available providers: {:?}", tpt_shared::available_providers());
-    println!("   Is 'claude' valid? {}", tpt_shared::is_valid_provider("claude"));
-    println!("   Is 'gpt4' valid? {}\n", tpt_shared::is_valid_provider("gpt4"));
+    println!("   Available providers: {:?}", tpt_gpu_shared::available_providers());
+    println!("   Is 'claude' valid? {}", tpt_gpu_shared::is_valid_provider("claude"));
+    println!("   Is 'gpt4' valid? {}\n", tpt_gpu_shared::is_valid_provider("gpt4"));
 
     // Example 7: Error handling
     println!("7. Error handling:");

@@ -108,7 +108,7 @@ pub fn optimize_vector_add_problem(
     eprintln!("    best: {:.1}% eff @ {} ({} evals)", hc_result.score, hc_result.params.display(), hc_result.eval_count);
     let final_result = if enable_ai {
         eprintln!("  [3/3] AI-guided refinement ({} iterations)...", ai_iterations);
-        let provider = tpt_shared::provider_from_env();
+        let provider = tpt_gpu_shared::provider_from_env();
         eprintln!("    provider: {}", provider.name());
         let r = crate::ai_guided_search(space, &hc_result.params, &eval, provider.as_ref(), "vector_add", ai_iterations);
         eprintln!("    best: {:.1}% eff @ {} ({} evals)", r.score, r.params.display(), r.eval_count);

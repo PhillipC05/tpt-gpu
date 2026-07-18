@@ -177,7 +177,7 @@ pub fn optimize_gemm_problem(
     // Phase 3: AI-guided (optional)
     let final_result = if enable_ai {
         eprintln!("  [3/3] AI-guided refinement ({} iterations)...", ai_iterations);
-        let provider = tpt_shared::provider_from_env();
+        let provider = tpt_gpu_shared::provider_from_env();
         eprintln!("    provider: {}", provider.name());
         let r = crate::ai_guided_search(space, &hc_result.params, &eval, provider.as_ref(), "gemm", ai_iterations);
         eprintln!("    best: {:.1}% eff @ {} ({} evals)", r.score, r.params.display(), r.eval_count);
@@ -454,7 +454,7 @@ pub fn optimize_attention_problem(
 
     // Phase 3: Optional AI-guided refinement
     let (final_result, ai_evals) = if enable_ai {
-        let provider = tpt_shared::provider_from_env();
+        let provider = tpt_gpu_shared::provider_from_env();
         let r = crate::ai_guided_search(
             space, &hc_result.params, &eval, provider.as_ref(), "attention", ai_iterations,
         );

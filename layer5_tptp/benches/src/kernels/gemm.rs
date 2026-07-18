@@ -4,8 +4,8 @@
 //! Problem sizes: MxKxN from 256 to 4096.
 
 use crate::harness::KernelBench;
-use tptp_core::prelude::*;
-use tptp_core::memory::{Shape, BufferFlags, DType};
+use tpt_gpu_primitives::prelude::*;
+use tpt_gpu_primitives::memory::{Shape, BufferFlags, DType};
 use std::time::Instant;
 
 pub struct GemmBench {
@@ -71,7 +71,7 @@ impl KernelBench for GemmBench {
         let mut c = GpuBuffer::<f32>::new(Shape::dim2(m, n), DType::F32, BufferFlags::STORAGE)?;
 
         let t0 = Instant::now();
-        let kernel = tptp_core::GemmKernel::new();
+        let kernel = tpt_gpu_primitives::GemmKernel::new();
         kernel.execute(&a, &b, Some(&mut c), 1.0, 0.0)?;
         let elapsed_ms = t0.elapsed().as_secs_f64() * 1000.0;
 

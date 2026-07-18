@@ -15,7 +15,7 @@ use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::net::{UnixListener, UnixStream};
 use tracing::{error, info, warn};
 
-use tptd_lib::{
+use tpt_gpu_driver_daemon::{
     context::GpuContext,
     fault::recover_gpu,
     mmio::Mmio,
@@ -49,7 +49,7 @@ async fn main() -> Result<()> {
     info!("TPT GPU v{maj}.{min}, VRAM {} MiB", mmio.vram_bytes() >> 20);
 
     // Boot GPU (skip if already running)
-    if mmio.read32(tptd_lib::mmio::regs::STATUS) & tptd_lib::mmio::status_bits::READY == 0 {
+    if mmio.read32(tpt_gpu_driver_daemon::mmio::regs::STATUS) & tpt_gpu_driver_daemon::mmio::status_bits::READY == 0 {
         mmio.boot(500).context("GPU boot failed")?;
     }
 
@@ -105,7 +105,7 @@ async fn handle_client(stream: UnixStream, ctx: Arc<GpuContext>) -> Result<()> {
 // Dispatch one request to the appropriate handler
 // ---------------------------------------------------------------------------
 async fn dispatch(req: Request, ctx: &Arc<GpuContext>) -> Response {
-    use tptd_lib::mmio::regs;
+    use tpt_gpu_driver_daemon::mmio::regs;
 
     match req {
         // ----- Get device info -----

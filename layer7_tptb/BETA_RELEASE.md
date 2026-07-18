@@ -56,15 +56,15 @@ compiler exposes through the `tpt.introspect` API.
 
 ```bash
 cd layer7_tptb
-cargo build --release -p tptb-cli
-# binary: target/release/tpt
+cargo build --release -p tpt-gpu-script-cli
+# binary: target/release/tpt-gpu-script
 ```
 
 ### Build the LSP server
 
 ```bash
-cargo build --release -p tptb-lsp
-# binary: target/release/tptb-lsp
+cargo build --release -p tpt-gpu-script-lsp
+# binary: target/release/tpt-gpu-lsp
 ```
 
 ### VS Code integration

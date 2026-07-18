@@ -27,7 +27,7 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles(''**/Cargo.lock'') }}
 
-      - name: Build tptc-rs
+      - name: Build tpt-gpu-compiler
         run: cargo build --release
         working-directory: .
 
