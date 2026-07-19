@@ -23,3 +23,12 @@ __pycache__/
 # Node
 node_modules/
 package-lock.json
+
+# Native build artifacts (e.g. layer4_tptr/tptr-c examples)
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Local AI-tool config (not project source)
+.kilo/
